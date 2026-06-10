@@ -1,80 +1,82 @@
 # MGX-v1 Report
 
-_Generated: 2026-04-13 16:13:14_
+_Generated: 2026-06-10 12:08:12_
 
 ## Metadata
-- **Source**: youtube
-- **Filename**: yt_audio.wav
-- **YouTube URL**: https://www.youtube.com/watch?v=Aiay8I5IPB8
-- **Title**: Nickelback - How You Remind Me [OFFICIAL VIDEO]
-- **Duration**: 228.4s
-- **Sample Rate**: 48000 Hz
+- **Source**: file
+- **Filename**: Tutti Morti.mp3
+- **Duration**: 81.6s
+- **Sample Rate**: 44100 Hz
 - **Analysis SR**: 22050 Hz
 
 ## R — Rhythm
-- **BPM**: 86.1328125
-- **Time Signature**: 4/4
-- **Beat Regularity**: 0.95
-- **Groove Complexity**: 0.27
-- **Swing Ratio**: 0.44
+- **BPM**: 172.265625
+- **Time Signature**: 3/4
+- **Beat Regularity**: 0.96
+- **Groove Complexity**: 0.25
+- **Swing Ratio**: 0.30
 - **BPM Confidence**: 1.00
 
 ## M — Melody
-- **Pitch Range**: 1824.2 Hz
-- **Mean Pitch**: 556.0 Hz
-- **Mean Interval**: 0.74 semitones
-- **Contour Direction**: 0.01
-- **Stepwise Ratio**: 0.91
+- **Pitch Range**: 1506.2 Hz
+- **Mean Pitch**: 406.1 Hz
+- **Mean Interval**: 0.48 semitones
+- **Contour Direction**: -0.01
+- **Stepwise Ratio**: 0.94
 - **Voiced Ratio**: 1.00
-- **Vocal Likelihood**: 0.73
-- **Pitch Confidence**: 0.40
-- **Top Contour Bigrams**: RR=0.61, UR=0.08, RU=0.08
+- **Vocal Likelihood**: 0.42
+- **Pitch Confidence**: 0.42
+- **Top Contour Bigrams**: RR=0.67, DR=0.07, RD=0.07
 
 ## H — Harmony
-- **Key Center**: A#
+- **Key Center**: C
 - **Mode**: major
-- **Key Confidence**: 0.90
+- **Key Confidence**: 0.32
 - **Mode Ambiguity**: low
-- **Tuning Offset**: +4.0 cents
+- **Tuning Offset**: +0.0 cents
 - **Key Candidates**:
-  - A# major: 0.8188
-  - F major: 0.6653
-  - D# major: 0.5589
-- **Harmonic Change Rate**: 0.0264
-- **Chroma Entropy**: 3.08
-- **Chord Estimation Tier**: 1 (Full chords)
-- **Chord Confidence**: 0.77
-- **Chord Sequence**: C5 | C7 | A#5 | F5 | Dm7 | A#min | C7 | Gm7 | D#5 | D# | C5 | A#5 | F5 | Dm7 | A# | A#5 | C7 | D#5 | G5 | C5 | Cmin | Cm7 | G# | C7 | A#5 | C7 | A#7 | Cm7 | C5 | F5 | A#5 | D#5
-- **Section-Weighted Key**: A# major (score 0.847)
-- **Relative Root Functions**: II | I | V | III | I | II | VI | IV | II | I | V | III | I | II | IV | VI | II | bVII | II | I | II | I | II | V
-- **Relative Chord Functions**: II5 | II7 | I5 | V5 | IIIm7 | Imin | II7 | VIm7 | IV5 | IV | II5 | I5 | V5 | IIIm7 | I | I5 | II7 | IV5 | VI5 | II5 | IImin | IIm7 | bVII | II7
-- **Harmonic Rhythm (changes/beat)**: 0.201
+  - C major: 0.7718
+  - A minor: 0.7391
+  - F major: 0.6256
+- **Harmonic Change Rate**: 0.0245
+- **Chroma Entropy**: 3.23
+- **Chord Estimation Tier**: 2 (Root sequence only)
+- **Chord Confidence**: 0.73
+- **Root Sequence**: F | C | A | F | C | A | F | C | A | F | A | C | G | E | A | F | D | C | A | D | F | D | F | C | A | F | D | A | D | F | D | C
+- **Section-Weighted Key**: C major (score 0.703)
+- **Relative Root Functions**: IV | I | VI | IV | I | VI | IV | I | VI | IV | VI | I | V | III | VI | IV | II | I | VI | II | IV | II | IV | I
+- **Harmonic Rhythm (changes/beat)**: 0.290
+  - _Note_: Relative key A minor is close (gap=0.033)
 
 ## X — Motif
-- **Repetition Density**: 0.4630
-- **Mean Self-Similarity**: 0.71
-- **Motif Pairs Found**: 10851
+- **Repetition Density**: 0.8441
+- **Mean Self-Similarity**: 0.93
+- **Motif Pairs Found**: 2280
 - **Estimated Unique Motifs**: 1
 - **Motif Confidence**: 1.00
 
 ## F — Form
-- **Sections Detected**: 23
-- **Unique Section Types**: 8
-- **Structural Repetition**: 0.65
-- **Section Sequence**: S7 -> S0 -> S7 -> S3 -> S6 -> S1 -> S2 -> S1 -> S6 -> S3 -> S6 -> S1 -> S2 -> S1 -> S4 -> S0 -> S3 -> S1 -> S5 -> S2 -> S1 -> S2 -> S4
+- **Sections Detected**: 7
+- **Unique Section Types**: 6
+- **Structural Repetition**: 0.14
+- **Section Sequence**: S4 -> S5 -> S2 -> S1 -> S0 -> S3 -> S0
 - **Form Confidence**: 1.00
 
 ## C — Confidence
-- **Overall Confidence**: 0.85
-- **Melody/Harmony Agreement**: 0.59
+- **Overall Confidence**: 0.74
+- **Melody/Harmony Agreement**: 0.60
   - rhythm: 1.00
-  - melody: 0.40
-  - harmony: 0.85
+  - melody: 0.42
+  - harmony: 0.27
   - motif: 1.00
   - form: 1.00
 
+## Warnings
+- Low confidence in harmony (0.27)
+
 ## Notes
-- Moderate melody/harmony alignment (agreement=0.59)
+- Moderate melody/harmony alignment (agreement=0.60)
+- Relative key A minor is close (gap=0.033)
 
 ---
 
