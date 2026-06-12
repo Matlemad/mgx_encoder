@@ -1,7 +1,8 @@
-"""MGX Lyrics Companion — guided songwriting flow."""
+"""MGX Librettist — melody-aware AI lyrics companion for songwriters."""
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 
@@ -10,8 +11,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import librosa
-import librosa.display
 
 from src.audio_loader import load_audio
 from src.youtube_loader import download_audio_from_youtube, is_valid_youtube_url
@@ -23,27 +22,37 @@ from src.motif import analyze_motif
 from src.form import analyze_form
 from src.confidence import compute_confidence
 from src.report import generate_report
-from src.lyrics_editor import analyze_lyrics
+from src.lyrics_editor import analyze_lyrics, analyze_lines_prosody
 from src.text_mining import mine_text, kwic
-from src.inspiration_engine import generate_inspiration
+from src.midi_analyzer import analyze_vocal_midi, analyze_backing_midi
+from src.writing_brief import generate_writing_brief
+from src.reference_profile import build_reference_profile
+from src.librettist_report import build_song_genome_summary, generate_librettist_report
 from src.providers.mock_musixmatch import MockMusixmatch
 from src.providers.mock_cyanite import MockCyanite
-from src.contextual_palette.selection_analyzer import classify_selection, SelectionType
+from src.contextual_palette.selection_analyzer import classify_selection
 from src.contextual_palette.runner import run_all_for_selection, get_available_modules
 from src.utils import save_json, save_text, ensure_dir, NumpyEncoder
 
 OUTPUTS_DIR = Path(__file__).parent / "outputs"
 TEMP_DIR = Path(__file__).parent / "temp"
 
-st.set_page_config(page_title="MGX Lyrics Companion", layout="wide")
+st.set_page_config(page_title="MGX Librettist", layout="wide")
+
+PROVIDER_MODE = os.environ.get("PROVIDER_MODE", "mock")
+HAS_API_KEYS = bool(os.environ.get("MUSIXMATCH_API_KEY") or os.environ.get("CYANITE_API_KEY"))
 
 # ─── Session state ──────────────────────────────────────────────────────────
 _DEFAULTS = {
+    "project_meta": {"title": "", "language": "auto", "created_at": "", "provider_mode": PROVIDER_MODE},
     "mgx_output": None, "mgx_json_str": None, "mgx_report_text": None,
     "cyanite_result": None, "musixmatch_result": None,
-    "lyrics_result": None, "mining_result": None, "inspiration_result": None,
-    "flow_step": 1, "palette_results": None,
-    "lyrics_saved": "",
+    "vocal_midi": None, "backing_midi": None,
+    "lyrics_result": None, "mining_result": None, "prosody_result": None,
+    "writing_brief": None, "reference_profile": None,
+    "palette_results": None, "lyrics_saved": "", "theme_prompt": "",
+    "inputs": {"audio_file": "", "vocal_midi_file": "", "backing_midi_file": "",
+               "reference_artists": [], "reference_songs": [], "avoid_references": []},
     "R": None, "M": None, "H": None, "X": None, "F": None, "C_data": None,
 }
 for k, v in _DEFAULTS.items():
@@ -51,57 +60,116 @@ for k, v in _DEFAULTS.items():
         st.session_state[k] = v
 
 
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+def _save_upload(uploaded, suffix: str = "") -> str:
+    ensure_dir(TEMP_DIR)
+    tmp = TEMP_DIR / (suffix + uploaded.name)
+    with open(tmp, "wb") as f:
+        f.write(uploaded.getbuffer())
+    return str(tmp)
+
+
+def build_full_project() -> dict:
+    """Assemble the unified project state JSON."""
+    return {
+        "project_meta": st.session_state.project_meta,
+        "inputs": st.session_state.inputs,
+        "analysis": {
+            "mgx": st.session_state.mgx_output or {},
+            "cyanite": st.session_state.cyanite_result or {},
+            "vocal_midi": st.session_state.vocal_midi or {},
+            "backing_midi": st.session_state.backing_midi or {},
+            "lyrics_structure": st.session_state.lyrics_result or {},
+            "lyrics_prosody": st.session_state.prosody_result or {},
+            "text_mining": st.session_state.mining_result or {},
+            "writing_brief": st.session_state.writing_brief or {},
+            "reference_profile": st.session_state.reference_profile or {},
+        },
+        "writing_studio": {
+            "selected_text": (st.session_state.palette_results or {}).get("_selected_text", ""),
+            "selection_type": (st.session_state.palette_results or {}).get("_selection_type", ""),
+            "palette_outputs": st.session_state.palette_results or {},
+        },
+        "exports": {
+            "mgx_output": "outputs/mgx_output.json",
+            "lyrics_mining": "outputs/lyrics_mining.json",
+            "full_project": "outputs/full_project.json",
+        },
+    }
+
+
+def palette_context() -> dict:
+    """Build the rich context passed to palette modules."""
+    return {
+        "mgx": st.session_state.mgx_output,
+        "cyanite": st.session_state.cyanite_result,
+        "musixmatch": st.session_state.musixmatch_result,
+        "mining": st.session_state.mining_result or {},
+        "vocal_midi": st.session_state.vocal_midi or {},
+        "lyrics_prosody": st.session_state.prosody_result or {},
+        "reference_profile": st.session_state.reference_profile or {},
+        "writing_brief": st.session_state.writing_brief or {},
+        "bpm": (st.session_state.R or {}).get("bpm"),
+    }
+
+
 # ─── Header ─────────────────────────────────────────────────────────────────
-st.title("MGX Lyrics Companion")
+st.title("MGX Librettist")
+st.caption("Melody-aware AI lyrics companion for songwriters — local, copyright-safe, mock-by-default.")
 
-step = st.session_state.flow_step
-step_labels = ["1. Analyze Demo", "2. Text & Mining", "3. Inspiration Studio", "Export"]
-step_icons = ["1️⃣", "2️⃣", "3️⃣", "📦"]
-cols = st.columns(len(step_labels))
-for i, (lbl, icon) in enumerate(zip(step_labels, step_icons), 1):
-    with cols[i - 1]:
-        if i < step:
-            st.success(f"{icon} {lbl}")
-        elif i == step:
-            st.info(f"**{icon} {lbl}**")
-        else:
-            st.caption(f"{icon} {lbl}")
+if PROVIDER_MODE == "mock" or not HAS_API_KEYS:
+    st.info("No API keys found: using mock providers (Musixmatch / Cyanite). The app is fully usable offline.")
 
-st.divider()
+tab_demo, tab_lyrics, tab_refs, tab_studio, tab_export = st.tabs(
+    ["1 · Demo Uploader", "2 · Lyrics Prompter", "3 · References", "4 · Writing Studio", "5 · Export"]
+)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 1 — ANALYZE DEMO
+# TAB 1 — DEMO UPLOADER
 # ═════════════════════════════════════════════════════════════════════════════
-if step == 1:
-    st.header("Step 1 — Upload your demo and analyze it")
-    st.caption("Upload the audio file of your demo (or paste a YouTube link). We'll extract the music genome and mock-enrich it with Cyanite.")
+with tab_demo:
+    st.header("Demo Uploader")
+    st.caption("Upload your demo audio (required). Optionally add vocal/backing MIDI and manual metadata.")
 
     col_file, col_yt = st.columns(2)
     with col_file:
-        uploaded_file = st.file_uploader("WAV / MP3 / FLAC", type=["wav", "mp3", "flac"], key="audio_upload")
+        uploaded_file = st.file_uploader("Demo audio — WAV / MP3 / FLAC", type=["wav", "mp3", "flac"], key="audio_upload")
     with col_yt:
         yt_url = st.text_input("Or paste a YouTube link", key="yt_url")
         with st.expander("YouTube auth"):
             yt_browser = st.selectbox("Cookies from", ["auto-detect", "chrome", "firefox", "safari", "edge", "brave", "none"], key="yt_browser")
             yt_cookies_file = st.text_input("cookies.txt path", key="yt_cookies_file")
 
+    col_vm, col_bm = st.columns(2)
+    with col_vm:
+        vocal_midi_up = st.file_uploader("Optional: vocal / topline MIDI", type=["mid", "midi"], key="vocal_midi_up")
+    with col_bm:
+        backing_midi_up = st.file_uploader("Optional: backing / harmony MIDI", type=["mid", "midi"], key="backing_midi_up")
+
+    with st.expander("Manual metadata (optional)"):
+        m1, m2, m3 = st.columns(3)
+        meta_title = m1.text_input("Song title", key="meta_title")
+        meta_lang = m2.selectbox("Language", ["auto", "en", "it"], key="meta_lang")
+        meta_bpm = m3.text_input("Declared BPM", key="meta_bpm")
+        m4, m5 = st.columns(2)
+        meta_key = m4.text_input("Declared key", key="meta_key")
+        meta_notes = m5.text_input("Notes about the song", key="meta_notes")
+
     run_btn = st.button("Analyze Demo", type="primary", use_container_width=True)
 
     if run_btn:
         ensure_dir(OUTPUTS_DIR); ensure_dir(TEMP_DIR)
-        audio_path = None; source = "file"; yt_title = None; yt_url_used = None; meta_notes = []
+        audio_path = None; source = "file"; yt_title = None; yt_url_used = None; meta_notes_list = []
 
         if uploaded_file is not None:
-            tmp = TEMP_DIR / uploaded_file.name
-            with open(tmp, "wb") as f: f.write(uploaded_file.getbuffer())
-            audio_path = str(tmp)
+            audio_path = _save_upload(uploaded_file)
         elif yt_url and yt_url.strip():
             if not is_valid_youtube_url(yt_url.strip()):
                 st.error("Invalid YouTube URL."); st.stop()
             with st.spinner("Downloading from YouTube..."):
                 try:
-                    _br = yt_browser if yt_browser not in ("auto-detect","none") else None
+                    _br = yt_browser if yt_browser not in ("auto-detect", "none") else None
                     _ck = yt_cookies_file.strip() or None
                     yt_result = download_audio_from_youtube(yt_url.strip(), output_dir=TEMP_DIR,
                         cookies_from_browser=_br if _br else None, cookies_file=_ck)
@@ -112,41 +180,56 @@ if step == 1:
         else:
             st.info("Upload a file or paste a URL to continue."); st.stop()
 
+        # Optional MIDI parsing (fails softly)
+        if vocal_midi_up is not None:
+            vmp = _save_upload(vocal_midi_up, "vocal_")
+            st.session_state.vocal_midi = analyze_vocal_midi(vmp)
+            st.session_state.inputs["vocal_midi_file"] = vmp
+        if backing_midi_up is not None:
+            bmp = _save_upload(backing_midi_up, "backing_")
+            st.session_state.backing_midi = analyze_backing_midi(bmp)
+            st.session_state.inputs["backing_midi_file"] = bmp
+
         with st.spinner("Loading audio..."): audio_data = load_audio(audio_path)
         with st.spinner("Preprocessing..."): pp = preprocess(audio_data["y"], audio_data["sr"])
 
         progress = st.progress(0, text="Rhythm...")
         try: R = analyze_rhythm(pp)
-        except Exception as e: R = {"error": str(e)}; meta_notes.append(str(e))
-        progress.progress(15, text="Melody...")
+        except Exception as e: R = {"error": str(e)}; meta_notes_list.append(str(e))
+        progress.progress(20, text="Melody...")
         try: M = analyze_melody(pp)
-        except Exception as e: M = {"error": str(e)}; meta_notes.append(str(e))
-        progress.progress(30, text="Harmony...")
+        except Exception as e: M = {"error": str(e)}; meta_notes_list.append(str(e))
+        progress.progress(40, text="Harmony...")
         try: H = analyze_harmony(pp)
-        except Exception as e: H = {"error": str(e)}; meta_notes.append(str(e))
-        progress.progress(50, text="Motifs...")
+        except Exception as e: H = {"error": str(e)}; meta_notes_list.append(str(e))
+        progress.progress(55, text="Motifs...")
         try: X = analyze_motif(pp)
-        except Exception as e: X = {"error": str(e)}; meta_notes.append(str(e))
-        progress.progress(65, text="Form...")
+        except Exception as e: X = {"error": str(e)}; meta_notes_list.append(str(e))
+        progress.progress(70, text="Form...")
         try: F = analyze_form(pp)
-        except Exception as e: F = {"error": str(e)}; meta_notes.append(str(e))
+        except Exception as e: F = {"error": str(e)}; meta_notes_list.append(str(e))
         progress.progress(80, text="Confidence...")
 
+        if meta_notes:
+            meta_notes_list.append(f"User note: {meta_notes}")
         meta = {"source": source, "filename": audio_data["filename"], "youtube_url": yt_url_used,
-                "title": yt_title, "duration_sec": round(audio_data["duration_sec"], 2),
-                "sample_rate": audio_data["original_sr"], "analysis_sample_rate": audio_data["sr"], "notes": meta_notes}
+                "title": meta_title or yt_title, "language": meta_lang,
+                "declared_bpm": meta_bpm, "declared_key": meta_key,
+                "duration_sec": round(audio_data["duration_sec"], 2),
+                "sample_rate": audio_data["original_sr"], "analysis_sample_rate": audio_data["sr"],
+                "notes": meta_notes_list}
 
         _NN = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-        _kc = H.get("key_center", H.get("key","C"))
+        _kc = H.get("key_center", H.get("key", "C"))
         _ki = _NN.index(_kc) if _kc in _NN else 0
-        _pc = np.array(M.get("pitch_class_histogram",[0.0]*12))
+        _pc = np.array(M.get("pitch_class_histogram", [0.0]*12))
         _pcr = np.roll(_pc, -_ki); _s = _pcr.sum()
         if _s > 0: _pcr = _pcr / _s
         M["pitch_class_profile_relative"] = _pcr.tolist()
 
         C_data = compute_confidence(meta, R, M, H, X, F)
-        def _strip(d): return {k:v for k,v in d.items() if k!="pass_details"}
-        mgx_output = {"meta":meta,"R":_strip(R),"M":_strip(M),"H":_strip(H),"X":_strip(X),"F":_strip(F),"C":C_data}
+        def _strip(d): return {k: v for k, v in d.items() if k != "pass_details"}
+        mgx_output = {"meta": meta, "R": _strip(R), "M": _strip(M), "H": _strip(H), "X": _strip(X), "F": _strip(F), "C": C_data}
 
         progress.progress(90, text="Cyanite enrichment (mock)...")
         mock_cy = MockCyanite()
@@ -164,241 +247,396 @@ if step == 1:
         st.session_state.cyanite_result = cy_data
         st.session_state.R = R; st.session_state.M = M; st.session_state.H = H
         st.session_state.X = X; st.session_state.F = F; st.session_state.C_data = C_data
+        st.session_state.inputs["audio_file"] = audio_path
+        st.session_state.project_meta.update({
+            "title": meta_title or yt_title or "",
+            "language": meta_lang,
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "provider_mode": PROVIDER_MODE,
+        })
 
-    # Show results if available
+    # ── Song Genome Summary ──
     if st.session_state.mgx_output:
         mgx = st.session_state.mgx_output
-        H = st.session_state.H; R = st.session_state.R
-        cy = st.session_state.cyanite_result
-
-        st.success("Demo analyzed!")
+        genome = build_song_genome_summary(mgx, st.session_state.cyanite_result, st.session_state.vocal_midi)
+        st.success("Demo analyzed — Song Genome Summary")
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("BPM", f"{R.get('bpm','?'):.0f}" if isinstance(R.get('bpm'), (int,float)) else "?")
-        kc = H.get("key_center", H.get("key","?")); km = H.get("key_mode", H.get("mode","?"))
-        c2.metric("Key", f"{kc} {km}")
-        c3.metric("Confidence", f"{st.session_state.C_data.get('overall_confidence',0):.0%}")
-        if cy:
-            c4.metric("Mood (mock)", cy.get("mood_primary", "?"))
+        bpm = genome.get("bpm")
+        c1.metric("BPM", f"{bpm:.0f}" if isinstance(bpm, (int, float)) else "?")
+        c2.metric("Key", f"{genome.get('key', '?')} {genome.get('mode', '')}")
+        oc = genome.get("overall_confidence")
+        c3.metric("Confidence", f"{oc:.0%}" if isinstance(oc, (int, float)) else "?")
+        c4.metric("Mood (mock)", genome.get("mood", "?") or "?")
 
+        cc1, cc2, cc3 = st.columns(3)
+        cc1.caption(f"Time signature: {genome.get('time_signature')}")
+        cc2.caption(f"Melodic contour: {genome.get('melodic_contour')}")
+        cc3.caption(f"Form: {genome.get('form_sections')}")
+
+        if st.session_state.vocal_midi:
+            vm = st.session_state.vocal_midi
+            if vm.get("warnings"):
+                for w in vm["warnings"]:
+                    st.warning(f"Vocal MIDI: {w}")
+            else:
+                st.caption(f"Vocal MIDI: {vm.get('n_notes')} notes · ~{vm.get('suggested_syllable_slots')} syllable slots · cadence {vm.get('cadence_profile')}")
+        else:
+            st.caption("No vocal MIDI uploaded: metric fit will use heuristic estimates.")
+
+        with st.expander("Song Genome Summary (JSON)"):
+            st.json(genome)
         with st.expander("Full MGX details"):
             st.json(mgx)
-        if cy:
+        if st.session_state.cyanite_result:
             with st.expander("Cyanite enrichment (mock)"):
-                st.json(cy)
-
-        st.button("Continue to Step 2 →", on_click=lambda: st.session_state.update(flow_step=2), type="primary", use_container_width=True)
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# STEP 2 — TEXT & MINING
-# ═════════════════════════════════════════════════════════════════════════════
-elif step == 2:
-    st.header("Step 2 — Paste your lyrics and run text mining")
-    st.caption("Paste the lyrics that are sung on the demo. The system will analyze structure and language.")
-
-    lyrics_text = st.text_area(
-        "Your lyrics:", height=300,
-        value=st.session_state.lyrics_saved,
-        placeholder="Verse 1\nYour first line here\nSecond line\n\nChorus\nRepeat this line\nRepeat this line",
-    )
-    # Persist lyrics outside the widget so they survive step changes
-    if lyrics_text != st.session_state.lyrics_saved:
-        st.session_state.lyrics_saved = lyrics_text
-
-    if lyrics_text and lyrics_text.strip():
-        lr = analyze_lyrics(lyrics_text)
-        st.session_state.lyrics_result = lr
-
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Lines", lr["n_lines"])
-        c2.metric("Stanzas", lr["n_stanzas"])
-        c3.metric("Words", lr["n_words"])
-        rep = lr["repeated_lines"]
-        c4.metric("Repeated lines", len(rep))
-
-        if rep:
-            with st.expander(f"Repeated lines ({len(rep)})"):
-                for rl in rep:
-                    st.text(f'  x{rl["count"]}  "{rl["line"]}"')
-
-        run_mining = st.button("Run Text Mining", type="primary", use_container_width=True)
-        if run_mining:
-            mr = mine_text(lyrics_text)
-            st.session_state.mining_result = mr
-
-        if st.session_state.mining_result:
-            mr = st.session_state.mining_result
-            st.success(f"Mining done: {mr['n_filtered_tokens']} tokens (no stopwords)")
-            col_f, col_b, col_c = st.columns(3)
-            with col_f:
-                st.markdown("**Top words**")
-                for w, c in list(mr["word_frequencies"].items())[:12]:
-                    st.text(f"  {c:3d}  {w}")
-            with col_b:
-                st.markdown("**Top bigrams**")
-                for bg, c in list(mr["bigrams"].items())[:10]:
-                    st.text(f"  {c:3d}  {bg}")
-            with col_c:
-                st.markdown("**Co-occurrences**")
-                for pair, c in list(mr["cooccurrences"].items())[:10]:
-                    st.text(f"  {c:3d}  {pair}")
-
-            kw_input = st.text_input("KWIC search:", key="kwic_kw")
-            if kw_input and kw_input.strip():
-                for r in kwic(mr["tokens"], kw_input.strip())[:15]:
-                    st.text(f"  ...{r['left']}  [{r['keyword']}]  {r['right']}...")
-
-            st.button("Continue to Step 3 →", on_click=lambda: st.session_state.update(flow_step=3), type="primary", use_container_width=True)
-
-    col_back, _ = st.columns([1, 3])
-    with col_back:
-        st.button("← Back to Step 1", on_click=lambda: st.session_state.update(flow_step=1))
+                st.json(st.session_state.cyanite_result)
+        if st.session_state.backing_midi:
+            with st.expander("Backing MIDI analysis"):
+                st.json(st.session_state.backing_midi)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 3 — INSPIRATION STUDIO (with contextual palette)
+# TAB 2 — LYRICS PROMPTER
 # ═════════════════════════════════════════════════════════════════════════════
-elif step == 3:
-    st.header("Step 3 — Inspiration Studio")
+with tab_lyrics:
+    st.header("Lyrics Prompter")
+    mode = st.radio("Mode", ["A — I already have lyrics", "B — I only have a theme / concept"], key="lyrics_mode")
+    lang = st.session_state.project_meta.get("language", "auto")
 
-    # ── Reference artists ──
-    with st.expander("Reference artists & corpus", expanded=False):
-        corpus_mode = st.selectbox("Corpus", ["All (global mock)", "Artist reference mode"], key="corpus_mode")
-        ref_artists = st.text_input("Reference artists (comma separated)", key="ref_artists",
-            placeholder="e.g. Joni Mitchell, Leonard Cohen")
+    if mode.startswith("A"):
+        st.caption("Paste your draft lyrics. We analyze structure, prosody, and run text mining.")
+        lyrics_text = st.text_area(
+            "Your lyrics:", height=300, value=st.session_state.lyrics_saved,
+            placeholder="Verse 1\nYour first line here\nSecond line\n\nChorus\nRepeat this line\nRepeat this line",
+        )
+        if lyrics_text != st.session_state.lyrics_saved:
+            st.session_state.lyrics_saved = lyrics_text
 
-        if st.button("Load corpus data"):
-            mock_mx = MockMusixmatch()
-            mining = st.session_state.mining_result or {}
-            top_themes = list(mining.get("word_frequencies", {}).keys())[:5]
-            mx_data = {"themes": mock_mx.search_by_theme(top_themes)}
-            if corpus_mode == "Artist reference mode" and ref_artists.strip():
-                mx_data["related_artists"] = []
-                for a in [x.strip() for x in ref_artists.split(",") if x.strip()][:3]:
-                    mx_data["related_artists"].extend(mock_mx.related_artists(a))
-            st.session_state.musixmatch_result = mx_data
+        if lyrics_text and lyrics_text.strip():
+            lr = analyze_lyrics(lyrics_text)
+            st.session_state.lyrics_result = lr
+            pr = analyze_lines_prosody(lyrics_text, lang)
+            st.session_state.prosody_result = pr
 
-            mock_cy = MockCyanite()
-            if not st.session_state.cyanite_result:
-                st.session_state.cyanite_result = mock_cy.analyze_audio("mock")
-            st.success("Corpus data loaded (mock).")
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("Lines", lr["n_lines"])
+            c2.metric("Stanzas", lr["n_stanzas"])
+            c3.metric("Words", lr["n_words"])
+            c4.metric("Avg syl/line", pr["average_syllables_per_line"])
 
-    # ── Main layout: lyrics + palette ──
+            for w in pr.get("warnings", []):
+                st.warning(w)
+
+            with st.expander("Per-line prosody"):
+                for ln in pr["lines"]:
+                    flag = " 🔁" if ln["is_repeated"] else ""
+                    st.text(f'  [{ln["estimated_syllables"]:>2} syl] {ln["text"]}{flag}')
+
+            if lr["repeated_lines"]:
+                with st.expander(f"Repeated lines ({len(lr['repeated_lines'])})"):
+                    for rl in lr["repeated_lines"]:
+                        st.text(f'  x{rl["count"]}  "{rl["line"]}"')
+
+            if st.button("Run Text Mining", type="primary"):
+                st.session_state.mining_result = mine_text(lyrics_text)
+
+            if st.session_state.mining_result:
+                mr = st.session_state.mining_result
+                st.success(f"Mining done: {mr['n_filtered_tokens']} tokens (no stopwords)")
+                col_f, col_b, col_c = st.columns(3)
+                with col_f:
+                    st.markdown("**Top words**")
+                    for w, c in list(mr["word_frequencies"].items())[:12]:
+                        st.text(f"  {c:3d}  {w}")
+                with col_b:
+                    st.markdown("**Top bigrams**")
+                    for bg, c in list(mr["bigrams"].items())[:10]:
+                        st.text(f"  {c:3d}  {bg}")
+                with col_c:
+                    st.markdown("**Co-occurrences**")
+                    for pair, c in list(mr["cooccurrences"].items())[:10]:
+                        st.text(f"  {c:3d}  {pair}")
+
+                kw_input = st.text_input("KWIC search:", key="kwic_kw")
+                if kw_input and kw_input.strip():
+                    for r in kwic(mr["tokens"], kw_input.strip())[:15]:
+                        st.text(f"  ...{r['left']}  [{r['keyword']}]  {r['right']}...")
+    else:
+        st.caption("Describe the theme/concept. We generate a Writing Brief (directions, not full lyrics).")
+        theme = st.text_area("Theme / concept:", height=150, value=st.session_state.theme_prompt,
+            placeholder="e.g. a song about leaving a city at dawn, mixed feelings of relief and loss")
+        if theme != st.session_state.theme_prompt:
+            st.session_state.theme_prompt = theme
+
+        if st.button("Generate Writing Brief", type="primary"):
+            genome = build_song_genome_summary(st.session_state.mgx_output, st.session_state.cyanite_result)
+            st.session_state.writing_brief = generate_writing_brief(
+                theme, language=lang, mgx_summary=genome, cyanite=st.session_state.cyanite_result)
+
+        wb = st.session_state.writing_brief
+        if wb and wb.get("core_theme"):
+            st.success(f"Writing Brief — core theme: {wb['core_theme']}")
+            st.markdown(f"**Emotional temperature:** {wb['emotional_temperature']}")
+            cwa, cwb = st.columns(2)
+            with cwa:
+                st.markdown("**Promising images**")
+                for i in wb["promising_images"]:
+                    st.write(f"- {i}")
+                st.markdown("**Possible scenes**")
+                for s in wb["possible_scenes"]:
+                    st.write(f"- {s}")
+            with cwb:
+                st.markdown("**Title seeds**")
+                for t in wb["possible_titles"]:
+                    st.write(f"- {t}")
+                st.markdown("**Images to avoid (clichés)**")
+                for a in wb["images_to_avoid"]:
+                    st.write(f"- {a}")
+            st.markdown("**Point-of-view options**: " + ", ".join(wb["point_of_view_options"]))
+            st.markdown("**Narrative arcs**: " + " · ".join(wb["narrative_arc_options"]))
+            st.caption(wb["copyright_safe_note"])
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 3 — REFERENCES
+# ═════════════════════════════════════════════════════════════════════════════
+with tab_refs:
+    st.header("References")
+    st.caption("Reference Profile — copyright-safe abstraction. We never fetch or display lyrics, only abstract patterns.")
+
+    r1, r2 = st.columns(2)
+    ref_artists = r1.text_input("Reference artists (comma separated)", key="ref_artists",
+        placeholder="e.g. Joni Mitchell, Leonard Cohen")
+    ref_songs = r2.text_input("Reference songs (optional)", key="ref_songs",
+        placeholder="e.g. song titles")
+    r3, r4 = st.columns(2)
+    genre_tags = r3.text_input("Genre / mood tags", key="genre_tags", placeholder="e.g. folk, melancholy")
+    avoid_artists = r4.text_input("Avoid sounding like (optional)", key="avoid_artists")
+
+    if st.button("Build Reference Profile", type="primary"):
+        artists = [a.strip() for a in ref_artists.split(",") if a.strip()]
+        if not artists:
+            st.info("No reference artists selected: corpus insights will use generic songwriting patterns.")
+        provider = MockMusixmatch()
+        profile = build_reference_profile(
+            artists=artists,
+            provider=provider,
+            reference_songs=[s.strip() for s in ref_songs.split(",") if s.strip()],
+            avoid_artists=[a.strip() for a in avoid_artists.split(",") if a.strip()],
+            genre_tags=[t.strip() for t in genre_tags.split(",") if t.strip()],
+            lyrics_context=st.session_state.lyrics_saved,
+        )
+        st.session_state.reference_profile = profile
+        st.session_state.inputs["reference_artists"] = artists
+        st.session_state.inputs["reference_songs"] = profile["reference_songs"]
+        st.session_state.inputs["avoid_references"] = profile["avoid"]
+        # also store a musixmatch corpus snapshot for the palette
+        seeds = [t.strip() for t in genre_tags.split(",") if t.strip()] or ["love", "night", "city"]
+        st.session_state.musixmatch_result = {"themes": provider.search_by_theme(seeds)}
+
+    profile = st.session_state.reference_profile
+    if profile and profile.get("artists") is not None:
+        st.success("Reference Profile — copyright-safe abstraction")
+        ap = profile["abstract_patterns"]
+        pc1, pc2 = st.columns(2)
+        with pc1:
+            st.markdown(f"**Narrative stance:** {ap['narrative_stance']}")
+            st.markdown(f"**Imagery density:** {ap['imagery_density']}")
+            st.markdown(f"**Verse style:** {ap['verse_style']}")
+            st.markdown(f"**Chorus style:** {ap['chorus_style']}")
+        with pc2:
+            st.markdown("**Common themes:** " + ", ".join(ap["common_themes"]))
+            st.markdown("**Lexical fields:** " + ", ".join(ap["lexical_fields"][:10]))
+            st.markdown("**Symbolic register:** " + ", ".join(ap["symbolic_register"]))
+        st.markdown("**Creative constraints**")
+        for c in profile["creative_constraints"]:
+            st.write(f"- {c}")
+        st.warning("Safe inspiration rules: " + " · ".join(profile["safe_inspiration_rules"]))
+        with st.expander("Reference Profile (JSON)"):
+            st.json(profile)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 4 — WRITING STUDIO
+# ═════════════════════════════════════════════════════════════════════════════
+with tab_studio:
+    st.header("Writing Studio")
+
+    # Top summary
+    genome = build_song_genome_summary(st.session_state.mgx_output, st.session_state.cyanite_result, st.session_state.vocal_midi)
+    s1, s2, s3, s4 = st.columns(4)
+    bpm = genome.get("bpm")
+    s1.metric("BPM", f"{bpm:.0f}" if isinstance(bpm, (int, float)) else "—")
+    s2.metric("Key", f"{genome.get('key', '—')} {genome.get('mode', '')}".strip())
+    s3.metric("Mood", genome.get("mood", "—") or "—")
+    rp = st.session_state.reference_profile
+    s4.metric("References", str(len(rp["artists"])) if rp and rp.get("artists") else "—")
+
     lyrics_text = st.session_state.lyrics_saved
     if not lyrics_text or not lyrics_text.strip():
-        st.warning("No lyrics found. Go back to Step 2 and paste your lyrics.")
+        st.warning("No lyrics found. Go to the Lyrics Prompter tab (Mode A) and paste your lyrics.")
     else:
         col_editor, col_palette = st.columns([3, 2])
 
         with col_editor:
             st.markdown("#### Your lyrics")
-            st.caption("Copy a word, phrase or stanza from below and paste it in the selection box underneath.")
-            st.code(lyrics_text, language=None)
+            edited = st.text_area("Editable lyrics", value=lyrics_text, height=340, key="studio_lyrics")
+            if edited != st.session_state.lyrics_saved:
+                st.session_state.lyrics_saved = edited
+                lyrics_text = edited
+            # line stats
+            pr = st.session_state.prosody_result
+            if pr:
+                with st.expander("Line stats"):
+                    for ln in pr["lines"]:
+                        st.text(f'  {ln["line_index"]:>2} | {ln["estimated_syllables"]:>2} syl | {ln["text"]}')
 
-            selected_text = st.text_input(
-                "Selection (paste here):",
+            selected_text = st.text_input("Selection (paste a word, phrase, stanza or chorus):",
                 key="palette_selection",
-                placeholder="e.g. broken heart  |  I walk the empty streets at night",
-            )
+                placeholder="e.g. broken heart  |  I walk the empty streets at night")
 
         with col_palette:
             st.markdown("#### Contextual Palette")
-
             if selected_text and selected_text.strip():
                 sel_type = classify_selection(selected_text, lyrics_text)
-                st.caption(f"Selection type: **{sel_type.value}**")
-
+                st.caption(f"Detected selection type: **{sel_type.value}**")
                 available = get_available_modules(sel_type)
-                mod_names = [m.title for m in available]
-                st.caption(f"{len(available)} tools available")
+                st.caption(f"{len(available)} tools available: " + ", ".join(m.title for m in available))
 
                 if st.button("Analyze Selection", type="primary", use_container_width=True):
-                    context = {
-                        "mgx": st.session_state.mgx_output,
-                        "cyanite": st.session_state.cyanite_result,
-                        "musixmatch": st.session_state.musixmatch_result,
-                        "mining": st.session_state.mining_result or {},
-                    }
-                    results = run_all_for_selection(selected_text, lyrics_text, context)
-                    st.session_state.palette_results = results
+                    st.session_state.palette_results = run_all_for_selection(
+                        selected_text, lyrics_text, palette_context())
 
-                if st.session_state.palette_results:
-                    res = st.session_state.palette_results
-                    st.caption(f"Results for: \"{res.get('_selected_text', '')[:60]}...\"")
+                res = st.session_state.palette_results
+                if res:
+                    st.caption(f'Results for: "{res.get("_selected_text", "")[:60]}"')
 
-                    # ── Lexical Constellation ──
-                    lc = res.get("lexical_constellation")
-                    if lc:
-                        with st.expander("🌐 Lexical Constellation", expanded=True):
-                            local = lc.get("local_connections", [])
-                            corpus = lc.get("corpus_connections", [])
-                            if local:
-                                st.markdown("**Local:** " + "  ".join(f"`{w}`" for w in local))
-                            if corpus:
-                                st.markdown("**Corpus:** " + "  ".join(f"`{w}`" for w in corpus))
+                    def _show(key, title, icon="•", expanded=False):
+                        data = res.get(key)
+                        if not data or "error" in data:
+                            return None
+                        return st.expander(f"{icon} {title}", expanded=expanded), data
 
-                    # ── Rhyme Explorer ──
-                    rh = res.get("rhyme_explorer")
-                    if rh:
-                        with st.expander("🎵 Rhyme Explorer"):
+                    # Metric Fit
+                    out = _show("metric_fit", "Metric Fit", "📏", expanded=True)
+                    if out:
+                        exp, d = out
+                        with exp:
+                            st.metric("Fit score", f"{d.get('fit_score', 0):.0%}")
+                            st.caption(f"{d.get('estimated_syllables')} syllables vs {d.get('available_melodic_slots')} slots ({d.get('slots_source')})")
+                            st.write(d.get("diagnosis", ""))
+                            for s in d.get("suggested_adjustments", []):
+                                st.info(s)
+
+                    # Stress Alignment
+                    out = _show("stress_alignment", "Stress Alignment", "🎯")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            st.metric("Alignment", f"{d.get('alignment_score', 0):.0%}")
+                            if d.get("strong_words"):
+                                st.markdown("**Anchored:** " + " ".join(f"`{w}`" for w in d["strong_words"]))
+                            if d.get("weakly_placed_words"):
+                                st.markdown("**Weakly placed:** " + " ".join(f"`{w}`" for w in d["weakly_placed_words"]))
+                            for s in d.get("suggestions", []):
+                                st.caption(s)
+
+                    # Hook Strength
+                    out = _show("hook_strength", "Hook Strength", "🪝")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            st.metric("Hook score", f"{d.get('hook_score', 0)}/100")
+                            for s in d.get("strengths", []):
+                                st.success(s)
+                            for w in d.get("weaknesses", []):
+                                st.warning(w)
+                            if d.get("title_candidates"):
+                                st.markdown("**Title candidates:** " + ", ".join(d["title_candidates"]))
+
+                    # Singability Check
+                    out = _show("singability_check", "Singability Check", "🎤")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            st.metric("Singability", f"{d.get('singability_score', 0)}/100")
+                            if d.get("difficult_clusters"):
+                                st.markdown("**Hard clusters:** " + ", ".join(d["difficult_clusters"]))
+                            for w in d.get("fast_note_warnings", []):
+                                st.warning(w)
+                            for s in d.get("suggestions", []):
+                                st.caption(s)
+
+                    # Lexical Constellation
+                    out = _show("lexical_constellation", "Lexical Constellation", "🌐")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            if d.get("local_connections"):
+                                st.markdown("**Local:** " + " ".join(f"`{w}`" for w in d["local_connections"]))
+                            if d.get("corpus_connections"):
+                                st.markdown("**Corpus:** " + " ".join(f"`{w}`" for w in d["corpus_connections"]))
+
+                    # Rhyme Explorer
+                    out = _show("rhyme_explorer", "Rhyme Explorer", "🎵")
+                    if out:
+                        exp, d = out
+                        with exp:
                             for cat in ["perfect_rhymes", "near_rhymes", "assonances", "consonances"]:
-                                items = rh.get(cat, [])
-                                if items:
-                                    label = cat.replace("_", " ").title()
-                                    st.markdown(f"**{label}:** " + "  ".join(f"`{w}`" for w in items))
+                                if d.get(cat):
+                                    st.markdown(f"**{cat.replace('_',' ').title()}:** " + " ".join(f"`{w}`" for w in d[cat]))
 
-                    # ── Metric Rewrite ──
-                    mr = res.get("metric_rewrite")
-                    if mr:
-                        with st.expander("📐 Metric-Aware Rewrite"):
-                            om = mr.get("original_metrics", {})
-                            st.caption(f"Original: {om.get('syllables',0)} syl, {om.get('word_count',0)} words, ending: {om.get('ending_type','?')}")
-                            for alt in mr.get("alternatives", []):
-                                st.markdown(
-                                    f"**[{alt['style']}]** {alt['text']}  \n"
-                                    f"_{om.get('syllables',0)} syl → {alt['syllables']} syl (diff {alt['distance_score']})_"
-                                )
+                    # Metric Rewrite
+                    out = _show("metric_rewrite", "Metric-Aware Rewrite", "📐")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            om = d.get("original_metrics", {})
+                            st.caption(f"Original: {om.get('syllables',0)} syl · target {d.get('target_syllables')}")
+                            for alt in d.get("alternatives", []):
+                                st.markdown(f"**[{alt['style']}]** {alt['text']}  \n_{alt['estimated_syllables']} syl — {alt['what_changed']} ({alt['fit_note']})_")
+                            for w in d.get("warnings", []):
+                                st.caption(w)
 
-                    # ── Emotional Reading ──
-                    er = res.get("emotional_reading")
-                    if er:
-                        with st.expander("💎 Emotional Reading"):
+                    # Emotional Reading
+                    out = _show("emotional_reading", "Emotional Reading", "💎")
+                    if out:
+                        exp, d = out
+                        with exp:
                             c1, c2, c3 = st.columns(3)
-                            c1.metric("Lyrics", er.get("lyrics_emotion","?"))
-                            c2.metric("Music", er.get("music_emotion","?"))
-                            c3.metric("Alignment", f"{er.get('alignment_score',0):.0%}")
-                            for n in er.get("notes", []):
+                            c1.metric("Lyrics", d.get("lyrics_emotion", "?"))
+                            c2.metric("Music", d.get("music_emotion", "?"))
+                            c3.metric("Alignment", f"{d.get('alignment_score', 0):.0%}")
+                            for n in d.get("notes", []):
                                 st.info(n)
+                            for opt in d.get("creative_options", []):
+                                st.caption(f"**{opt['approach']}** — {opt['suggestion']}")
 
-                    # ── Corpus Insights ──
-                    ci = res.get("corpus_insights")
-                    if ci:
-                        with st.expander("📚 Corpus Insights"):
-                            common = ci.get("common_associations", [])
-                            less = ci.get("less_common_directions", [])
-                            if common:
-                                st.markdown("**Common:** " + "  ".join(f"`{w}`" for w in common))
-                            if less:
-                                st.markdown("**Less explored:** " + "  ".join(f"`{w}`" for w in less))
+                    # Corpus Insights
+                    out = _show("corpus_insights", "Corpus Insights", "📚")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            if d.get("common_associations"):
+                                st.markdown("**Common:** " + " ".join(f"`{w}`" for w in d["common_associations"]))
+                            if d.get("less_common_directions"):
+                                st.markdown("**Less explored:** " + " ".join(f"`{w}`" for w in d["less_common_directions"]))
+                            for n in d.get("reference_patterns", []):
+                                st.caption(n)
 
-                    # ── Cliche Detector ──
-                    cd = res.get("cliche_detector")
-                    if cd:
-                        with st.expander("⚡ Cliche Detector"):
-                            score = cd.get("cliche_score", 0)
-                            if score > 70:
-                                st.error(f"Cliche score: {score}/100")
-                            elif score > 30:
-                                st.warning(f"Cliche score: {score}/100")
-                            else:
-                                st.success(f"Cliche score: {score}/100 — looking fresh")
-                            for r in cd.get("reasons", []):
+                    # Cliche Detector
+                    out = _show("cliche_detector", "Cliche Detector", "⚡")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            score = d.get("cliche_score", 0)
+                            (st.error if score > 70 else st.warning if score > 30 else st.success)(f"Cliche score: {score}/100")
+                            for r in d.get("reasons", []):
                                 st.caption(r)
-                            alts = cd.get("alternatives", [])
-                            if alts:
-                                st.markdown("**Try instead:** " + "  ".join(f"`{a}`" for a in alts))
+                            if d.get("alternatives"):
+                                st.markdown("**Try instead:** " + " ".join(f"`{a}`" for a in d["alternatives"]))
 
-                    # ── Imagery Analyzer ──
+                    # Imagery Analyzer
                     ia = res.get("imagery_analyzer")
                     if ia and any(isinstance(v, (int, float)) and v > 0 for v in ia.values()):
                         with st.expander("👁 Imagery Analyzer"):
@@ -407,67 +645,58 @@ elif step == 3:
                             if any(v > 0 for v in vals):
                                 fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(polar=True))
                                 angles = np.linspace(0, 2 * np.pi, len(senses), endpoint=False).tolist()
-                                vals_plot = vals + [vals[0]]
-                                angles += [angles[0]]
-                                ax.fill(angles, vals_plot, alpha=0.25)
-                                ax.plot(angles, vals_plot, linewidth=2)
-                                ax.set_xticks(angles[:-1])
-                                ax.set_xticklabels(senses, size=8)
+                                vals_plot = vals + [vals[0]]; angles += [angles[0]]
+                                ax.fill(angles, vals_plot, alpha=0.25); ax.plot(angles, vals_plot, linewidth=2)
+                                ax.set_xticks(angles[:-1]); ax.set_xticklabels(senses, size=8)
                                 ax.set_ylim(0, max(vals_plot) + 0.1)
-                                st.pyplot(fig)
-                                plt.close()
-                            else:
-                                st.caption("No sensory imagery detected in selection.")
+                                st.pyplot(fig); plt.close()
 
-                    # ── Narrative Function ──
-                    nf = res.get("narrative_function")
-                    if nf:
-                        with st.expander("📖 Narrative Function"):
-                            st.metric("Role", nf.get("detected_role", "?"))
-                            st.caption(f"Confidence: {nf.get('confidence', 0):.0%}")
-                            alts = nf.get("alternatives", [])
-                            if alts:
-                                st.caption(f"Alternatives: {', '.join(alts)}")
+                    # Narrative Function
+                    out = _show("narrative_function", "Narrative Function", "📖")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            st.metric("Role", d.get("detected_role", "?"))
+                            if d.get("alternatives"):
+                                st.caption(f"Alternatives: {', '.join(d['alternatives'])}")
 
-                    # ── Repetition Radar ──
-                    rr = res.get("repetition_radar")
-                    if rr:
-                        with st.expander("🔁 Repetition Radar"):
-                            rw = rr.get("repeated_words", [])
-                            if rw:
-                                st.markdown("**Repeated:** " + "  ".join(f"`{w['word']}` x{w['count']}" for w in rw[:10]))
-                            syms = rr.get("repeated_symbols", [])
-                            if syms:
-                                st.markdown("**Symbolic fields:** " + "  ".join(f"`{s}`" for s in syms))
+                    # Repetition Radar
+                    out = _show("repetition_radar", "Repetition Radar", "🔁")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            if d.get("repeated_words"):
+                                st.markdown("**Repeated:** " + " ".join(f"`{w['word']}` x{w['count']}" for w in d["repeated_words"][:10]))
 
-                    # ── Inspiration Directions ──
-                    idir = res.get("inspiration_directions")
-                    if idir:
-                        with st.expander("✨ Inspiration Directions", expanded=True):
-                            ue = idir.get("underexplored_territories", [])
-                            if ue:
-                                st.markdown("**Underexplored:** " + "  ".join(f"`{t}`" for t in ue))
-                            so = idir.get("symbolic_opportunities", [])
-                            for s in so:
+                    # Title Finder
+                    out = _show("title_finder", "Title Finder", "🏷")
+                    if out:
+                        exp, d = out
+                        with exp:
+                            for t in d.get("title_candidates", []):
+                                st.markdown(f"**{t['title']}** — _{t['reason']}_")
+
+                    # Inspiration Directions
+                    out = _show("inspiration_directions", "Inspiration Directions", "✨", expanded=True)
+                    if out:
+                        exp, d = out
+                        with exp:
+                            if d.get("underexplored_territories"):
+                                st.markdown("**Underexplored:** " + " ".join(f"`{t}`" for t in d["underexplored_territories"]))
+                            for s in d.get("creative_directions", []):
                                 st.info(s)
-                            for p in idir.get("creative_prompts", []):
+                            for s in d.get("symbolic_opportunities", []):
+                                st.caption(s)
+                            for p in d.get("creative_prompts", []):
                                 st.success(p)
-
             else:
-                st.caption("Select text from your lyrics to activate the palette.")
-
-    st.divider()
-    col_back, col_fwd = st.columns(2)
-    with col_back:
-        st.button("← Back to Step 2", on_click=lambda: st.session_state.update(flow_step=2))
-    with col_fwd:
-        st.button("Go to Export →", on_click=lambda: st.session_state.update(flow_step=4), type="primary")
+                st.caption("Paste text from your lyrics into the selection box to activate the palette.")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 4 — EXPORT
+# TAB 5 — EXPORT
 # ═════════════════════════════════════════════════════════════════════════════
-elif step == 4:
+with tab_export:
     st.header("Export")
     ensure_dir(OUTPUTS_DIR)
 
@@ -478,40 +707,36 @@ elif step == 4:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("MGX", "ready" if has_mgx else "—")
     c2.metric("Text Mining", "ready" if has_mining else "—")
-    c3.metric("Palette", "ready" if has_palette else "—")
-    c4.metric("Full Project", "ready" if (has_mgx or has_mining) else "—")
+    c3.metric("Reference", "ready" if st.session_state.reference_profile else "—")
+    c4.metric("Palette", "ready" if has_palette else "—")
 
     st.divider()
+    full = build_full_project()
+    full_json = json.dumps(full, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    report_md = generate_librettist_report(full)
+
+    # persist to disk
+    save_json(full, OUTPUTS_DIR / "full_project.json")
+    save_text(report_md, OUTPUTS_DIR / "librettist_report.md")
+    if has_mining:
+        save_json(st.session_state.mining_result, OUTPUTS_DIR / "lyrics_mining.json")
 
     col_a, col_b = st.columns(2)
     with col_a:
+        st.download_button("Download Full Project JSON", full_json,
+            file_name="full_project.json", mime="application/json", use_container_width=True)
         if has_mgx:
             st.download_button("MGX JSON", st.session_state.mgx_json_str,
                 file_name="mgx_output.json", mime="application/json", use_container_width=True)
-        if has_mgx and st.session_state.mgx_report_text:
-            st.download_button("MGX Report", st.session_state.mgx_report_text,
-                file_name="mgx_report.md", mime="text/markdown", use_container_width=True)
     with col_b:
+        st.download_button("Librettist Report (Markdown)", report_md,
+            file_name="librettist_report.md", mime="text/markdown", use_container_width=True)
         if has_mining:
             st.download_button("Lyrics Mining JSON",
                 json.dumps(st.session_state.mining_result, indent=2, ensure_ascii=False),
                 file_name="lyrics_mining.json", mime="application/json", use_container_width=True)
 
-    # Full project
-    if has_mgx or has_mining:
-        st.divider()
-        full = {
-            "mgx": st.session_state.mgx_output or {},
-            "lyrics": st.session_state.lyrics_result or {},
-            "text_mining": st.session_state.mining_result or {},
-            "cyanite": st.session_state.cyanite_result or {},
-            "musixmatch": st.session_state.musixmatch_result or {},
-            "inspiration": st.session_state.inspiration_result or {},
-            "palette_last": st.session_state.palette_results or {},
-        }
-        st.download_button("Download Full Project JSON",
-            json.dumps(full, indent=2, cls=NumpyEncoder, ensure_ascii=False),
-            file_name="full_project.json", mime="application/json", use_container_width=True)
-
-    st.divider()
-    st.button("← Back to Studio", on_click=lambda: st.session_state.update(flow_step=3))
+    with st.expander("Full project preview"):
+        st.json(full)
+    with st.expander("Librettist report preview"):
+        st.markdown(report_md)

@@ -52,11 +52,45 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     if cliche.get("cliche_score", 0) > 70:
         symbolic.append("High cliche density detected — consider replacing the flagged phrase with a more original image.")
 
+    # Combine the full Librettist context into focused directions.
+    directions: list[str] = []
+
+    mgx = context.get("mgx", {})
+    rhythm = mgx.get("R", {}) if isinstance(mgx, dict) else {}
+    harmony = mgx.get("H", {}) if isinstance(mgx, dict) else {}
+    bpm = rhythm.get("bpm")
+    mode = harmony.get("key_mode") or harmony.get("mode")
+    if bpm and bpm > 130:
+        directions.append("Music is fast — short, image-dense lines will track the energy better than long sentences.")
+    elif bpm and bpm < 80:
+        directions.append("Music is slow — there is room to let a single image breathe across the phrase.")
+    if mode == "minor":
+        directions.append("Minor tonality invites understatement; let restraint carry the weight.")
+
+    cyanite = context.get("cyanite", {})
+    if cyanite.get("mood_primary"):
+        directions.append(f"Music mood reads as '{cyanite['mood_primary']}' — decide whether to align or contrast the lyric.")
+
+    ref = context.get("reference_profile", {})
+    patterns = ref.get("abstract_patterns", {}) if isinstance(ref, dict) else {}
+    if patterns.get("narrative_stance"):
+        directions.append(f"Reference stance is {patterns['narrative_stance']} — try a draft from that vantage point.")
+
+    brief = context.get("writing_brief", {})
+    if brief.get("promising_images"):
+        directions.append(f"From your brief: explore '{brief['promising_images'][0]}'.")
+
+    vocal_midi = context.get("vocal_midi", {})
+    if vocal_midi.get("cadence_profile"):
+        directions.append(f"Vocal melody cadence is {vocal_midi['cadence_profile']} — shape the last line to match.")
+
     import random
     prompts = random.sample(_PROMPTS, min(3, len(_PROMPTS)))
 
     return {
+        "module": "inspiration_directions",
         "underexplored_territories": underexplored,
         "symbolic_opportunities": symbolic,
+        "creative_directions": directions,
         "creative_prompts": prompts,
     }

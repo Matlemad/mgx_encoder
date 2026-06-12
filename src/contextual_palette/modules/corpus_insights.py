@@ -40,8 +40,23 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
             common_all.extend(t.get("corpus_associations", [])[:3])
             themes.append(t.get("theme", ""))
 
+    # Fold in abstract reference-profile patterns (copyright-safe, no lyrics).
+    ref = context.get("reference_profile", {}) or {}
+    patterns = ref.get("abstract_patterns", {})
+    ref_notes: list[str] = []
+    if patterns:
+        common_all.extend(patterns.get("lexical_fields", [])[:4])
+        themes.extend(patterns.get("common_themes", [])[:3])
+        if patterns.get("imagery_density"):
+            ref_notes.append(f"Reference imagery density: {patterns['imagery_density']}.")
+        if patterns.get("chorus_style"):
+            ref_notes.append(f"Reference chorus tendency: {patterns['chorus_style']}.")
+
     return {
+        "module": "corpus_insights",
         "common_associations": list(dict.fromkeys(common_all))[:10],
-        "dominant_themes": list(dict.fromkeys(themes))[:5],
+        "dominant_themes": list(dict.fromkeys([t for t in themes if t]))[:5],
         "less_common_directions": list(dict.fromkeys(less_common_all))[:8],
+        "reference_patterns": ref_notes,
+        "note": "Corpus and reference data are abstract patterns only — no lyrics are reproduced.",
     }

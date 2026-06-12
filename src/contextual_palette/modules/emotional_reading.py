@@ -68,6 +68,11 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     pair = (lyrics_emotion, music_emotion)
     alignment = _COMPAT.get(pair, _COMPAT.get((pair[1], pair[0]), 0.50))
 
+    energy = None
+    if cyanite:
+        energy = cyanite.get("energy")
+    section_role = context.get("section_role", "")
+
     notes = []
     if alignment < 0.5:
         notes.append(f"Lyrics read as '{lyrics_emotion}' but music suggests '{music_emotion}' — intentional contrast?")
@@ -76,9 +81,34 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     else:
         notes.append(f"Good alignment: both lyrics and music convey '{lyrics_emotion}' / '{music_emotion}'.")
 
+    if energy is not None and lyrics_emotion in ("sadness", "melancholy", "nostalgia") and isinstance(energy, (int, float)) and energy > 0.6:
+        notes.append("The emotional tone of the lyric is static/low while the music has high energy.")
+    if section_role:
+        notes.append(f"This is a '{section_role}' section — match its emotional function.")
+
+    creative_options = [
+        {
+            "approach": "align with music",
+            "suggestion": f"Lean the lyric further into '{music_emotion}' so words and sound reinforce each other.",
+        },
+        {
+            "approach": "contrast against music intentionally",
+            "suggestion": f"Keep the lyric '{lyrics_emotion}' against '{music_emotion}' music for productive tension.",
+        },
+        {
+            "approach": "increase tension",
+            "suggestion": "Introduce a contradictory image so the emotion is shown, not declared.",
+        },
+    ]
+
     return {
+        "module": "emotional_reading",
         "lyrics_emotion": lyrics_emotion,
+        "lyrics_confidence": round(lyrics_conf, 2),
         "music_emotion": music_emotion,
+        "music_energy": energy,
+        "section_role": section_role,
         "alignment_score": round(alignment, 2),
         "notes": notes,
+        "creative_options": creative_options,
     }

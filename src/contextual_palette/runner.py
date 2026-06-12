@@ -13,18 +13,28 @@ from .modules import (
     narrative_function,
     repetition_radar,
     inspiration_directions,
+    metric_fit,
+    stress_alignment,
+    hook_strength,
+    singability_check,
+    title_finder,
 )
 
 _ALL_MODULES = [
     lexical_constellation,
     rhyme_explorer,
     metric_rewrite,
+    metric_fit,
+    stress_alignment,
+    hook_strength,
+    singability_check,
     emotional_reading,
     corpus_insights,
     cliche_detector,
     imagery_analyzer,
     narrative_function,
     repetition_radar,
+    title_finder,
     inspiration_directions,
 ]
 
@@ -61,6 +71,13 @@ def run_all_for_selection(
         context["imagery"] = results["imagery_analyzer"]
     if "cliche_detector" in results:
         context["cliche"] = results["cliche_detector"]
+
+    # Feed metric_fit targets into metric_rewrite so rewrites hit the slot count.
+    if "metric_fit" in results and isinstance(results["metric_fit"], dict):
+        context["metric_fit_targets"] = results["metric_fit"].get("rewrite_targets", {})
+        if metric_rewrite in modules:
+            results[metric_rewrite.id] = run_module(metric_rewrite, text, context)
+
     if inspiration_directions in modules:
         results[inspiration_directions.id] = run_module(inspiration_directions, text, context)
 

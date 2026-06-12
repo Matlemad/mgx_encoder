@@ -1,15 +1,22 @@
-# MGX Lyrics Companion
+# MGX Librettist
 
-Songwriting assistant che combina:
+**Melody-aware AI lyrics companion for songwriters.**
+
+MGX Librettist non "genera testi": aiuta il songwriter a scrivere parole che si incastrano con la melodia, il mood, la struttura, i riferimenti e la direzione emotiva del brano caricato. Combina:
+
 - **MGX audio genome analysis** — analisi strutturale del mix (DSP locale)
+- **MIDI analysis** — analisi opzionale di topline vocale e backing (slot sillabici, cadenze, pitch-class profile)
 - **Cyanite enrichment** — mood, genre, energy, valence (mock, API ready)
-- **Lyrics editor** — stats strutturali del testo
-- **TACT-style text mining** — frequenze, n-grammi, co-occorrenze, KWIC
-- **Contextual Palette** — 10 moduli di analisi contestuale attivati dalla selezione del testo
-- **Musixmatch corpus exploration** — associazioni lessicali dal corpus (mock, API ready)
+- **Lyrics Prompter** — due modalità: testo già scritto (struttura + prosodia + mining) o solo un tema (Writing Brief)
+- **Reference Profile** — astrazione copyright-safe di artisti/canzoni di riferimento
+- **Contextual Palette** — 15 moduli di analisi contestuale attivati dalla selezione del testo
 - **Inspiration engine** — direzioni creative dall'incrocio di tutti i dati
 
-Tutto gira **in locale**. Nessuna API cloud necessaria. I provider esterni sono mockati con dati realistici e attivabili aggiungendo le API key.
+Tutto gira **in locale**. Nessuna API cloud necessaria. I provider esterni (Musixmatch, Cyanite) e l'eventuale LLM (OpenAI/Claude) sono mockati con dati realistici e attivabili aggiungendo le API key in `.env`.
+
+### Regola di sicurezza copyright
+
+Il sistema **non** imita artisti viventi o defunti e **non** riproduce testi protetti. I riferimenti vengono usati solo per estrarre pattern astratti e copyright-safe: temi, campi lessicali, densità di immagini, tendenze di lunghezza dei versi, stance narrativa, temperatura emotiva, tendenze strutturali, tendenze ritmico-foniche, territori simbolici. **L'autore resta il songwriter.**
 
 ---
 
@@ -61,24 +68,27 @@ Si apre automaticamente il browser su `http://localhost:8501`.
 
 ### 5. Usa l'app
 
-L'app ti guida in 3 step:
+L'app è organizzata in **5 tab**:
 
-1. **Step 1 — Analyze Demo**: carica il tuo demo audio e clicca "Analyze Demo"
-2. **Step 2 — Text & Mining**: incolla il testo del brano e clicca "Run Text Mining"
-3. **Step 3 — Inspiration Studio**: seleziona porzioni di testo e usa la Contextual Palette per esplorare rime, riscritture, emozioni, cliche, immagini, e direzioni creative
+1. **Demo Uploader**: carica il demo audio (richiesto) e, opzionalmente, MIDI vocale + MIDI backing + metadata manuali. Genera la *Song Genome Summary*.
+2. **Lyrics Prompter**: scegli la modalità — **A** (ho già il testo: struttura, prosodia, text mining) o **B** (ho solo un tema: genera un *Writing Brief*, non testi completi).
+3. **References**: inserisci artisti/canzoni/tag di riferimento. Genera un *Reference Profile* copyright-safe (solo pattern astratti).
+4. **Writing Studio**: editor del testo a sinistra, **Contextual Palette** a destra, riepilogo del brano in alto. Seleziona una porzione di testo e attiva i moduli.
+5. **Export**: scarica `full_project.json`, il report Markdown e i singoli JSON.
 
-Alla fine, vai su **Export** per scaricare tutti i file.
+> MIDI opzionale: se non carichi un MIDI vocale, i moduli metrici useranno stime euristiche da BPM e lunghezza dei versi.
 
 ### 6. Dove trovo i file di output?
 
 ```
 mgx_encoder/
   outputs/
-    mgx_output.json       ← genoma MGX-v1
-    mgx_report.md         ← report leggibile
-    lyrics_mining.json    ← text mining
-    full_project.json     ← tutto insieme
-    plots/                ← grafici debug (se abilitati)
+    mgx_output.json         ← genoma MGX-v1
+    mgx_report.md           ← report MGX leggibile
+    lyrics_mining.json      ← text mining
+    full_project.json       ← stato di progetto unificato (tutto)
+    librettist_report.md    ← report Librettist leggibile
+    plots/                  ← grafici debug (se abilitati)
 ```
 
 ### 7. Sessioni successive
@@ -95,7 +105,7 @@ streamlit run app.py
 
 ```
 mgx_encoder/
-  app.py                        ← UI Streamlit (flow guidato a 3 step)
+  app.py                        ← UI Streamlit (5 tab: Demo, Lyrics, References, Studio, Export)
   requirements.txt
   .env.example                  ← template per API key
   src/
@@ -110,9 +120,13 @@ mgx_encoder/
     motif.py                    ← X: ripetizioni, auto-similarita
     form.py                     ← F: segmentazione in sezioni
     confidence.py               ← C: confidenze, coerenza, warning
-    report.py                   ← generazione report Markdown
-    lyrics_editor.py            ← analisi strutturale del testo
+    report.py                   ← generazione report MGX Markdown
+    midi_analyzer.py            ← analisi MIDI vocale/backing (mido)
+    lyrics_editor.py            ← struttura del testo + prosodia/sillabe
     text_mining.py              ← TACT-style: frequenze, n-grammi, KWIC
+    writing_brief.py            ← Writing Brief da un tema (Mode B)
+    reference_profile.py        ← Reference Profile copyright-safe
+    librettist_report.py        ← Song Genome Summary + report Librettist
     inspiration_engine.py       ← sintesi creativa da tutti i dati
     utils.py                    ← helper
     providers/
@@ -130,12 +144,17 @@ mgx_encoder/
         lexical_constellation.py
         rhyme_explorer.py
         metric_rewrite.py
+        metric_fit.py
+        stress_alignment.py
+        hook_strength.py
+        singability_check.py
         emotional_reading.py
         corpus_insights.py
         cliche_detector.py
         imagery_analyzer.py
         narrative_function.py
         repetition_radar.py
+        title_finder.py
         inspiration_directions.py
   outputs/
   temp/
@@ -388,31 +407,32 @@ Per confrontare, calcola la **cosine similarity** tra i vettori numerici (interv
 
 ## Flow esperienziale
 
-L'app guida l'utente in un percorso a 3 step:
+L'app guida l'utente in 5 tab:
 
-### Step 1 — Analyze Demo
-Upload del file audio (WAV/MP3/FLAC) o link YouTube. Il sistema:
+### 1 — Demo Uploader
+Upload del file audio (WAV/MP3/FLAC) o link YouTube, più MIDI opzionali e metadata manuali. Il sistema:
 - Estrae il genoma musicale MGX-v1 (R, M, H, X, F, C)
+- Analizza MIDI vocale (slot sillabici, frasi, cadenza) e backing (pitch-class profile, root) se forniti
 - Arricchisce con dati Cyanite (mock): mood, genre, energy, valence, instrumentation
-- Mostra un riepilogo: BPM, key, confidence, mood
+- Mostra la **Song Genome Summary**: BPM, time signature, key/mode + confidence, mood/energy/valence, sezioni, contorno melodico, warning
 
-### Step 2 — Text & Mining
-Incolla il testo del brano (lo stesso cantato sul demo). Il sistema:
-- Conta righe, strofe, parole, righe ripetute
-- Esegue text mining TACT-style: frequenze, bigrammi, co-occorrenze
-- Offre ricerca KWIC (keyword-in-context)
+### 2 — Lyrics Prompter
+Due modalità:
+- **Mode A — ho già il testo**: struttura, prosodia per riga (sillabe, ending, stress hint, rime), text mining TACT-style (frequenze, bigrammi, co-occorrenze, KWIC)
+- **Mode B — ho solo un tema**: genera un **Writing Brief** (tema, POV, temperatura emotiva, scene, campi lessicali, immagini promettenti/da evitare, titoli, concept di ritornello, archi narrativi). **Non** genera testi completi.
 
-### Step 3 — Inspiration Studio
-Il cuore dell'esperienza. Due colonne:
-- **Sinistra**: il testo del brano
+### 3 — References
+Inserisci artisti, canzoni e tag di riferimento (+ eventuali "avoid"). Genera un **Reference Profile — copyright-safe abstraction**: solo pattern astratti (stance narrativa, densità di immagini, stile di verso/ritornello, registro simbolico, vincoli creativi). Mai testi.
+
+### 4 — Writing Studio
+Il cuore dell'esperienza. In alto il riepilogo del brano; due colonne:
+- **Sinistra**: editor del testo (persistente) + statistiche per riga
 - **Destra**: la **Contextual Palette**
 
-L'utente seleziona una porzione di testo e la incolla nel campo di selezione. Il sistema classifica automaticamente il tipo di selezione e attiva i moduli pertinenti.
+L'utente incolla una porzione di testo nel campo di selezione. Il sistema classifica il tipo di selezione e attiva i moduli pertinenti, alimentati dal contesto completo (MGX, Cyanite, MIDI vocale, prosodia, reference profile, writing brief, mining).
 
-Prima di analizzare, l'utente puo scegliere artisti di riferimento (o "All") e caricare dati corpus mock da Musixmatch.
-
-### Export
-Download di tutti gli output: MGX JSON, Mining JSON, Full Project JSON.
+### 5 — Export
+Download di tutti gli output: Full Project JSON, MGX JSON, Lyrics Mining JSON e il **Librettist Report** in Markdown.
 
 ---
 
@@ -430,31 +450,31 @@ La palette e un pannello contestuale che si attiva sulla selezione del testo. Cl
 | `CHORUS` | Strofa con "chorus"/"ritornello" | Keyword nel testo |
 | `FULL_TEXT` | Tutto il testo | Match con i lyrics completi |
 
-### I 10 moduli
+### I 15 moduli
 
 | # | Modulo | Scopo | Tipi supportati |
 |---|--------|-------|-----------------|
 | 1 | **Lexical Constellation** | Espansione semantica: connessioni locali + corpus | WORD, PHRASE |
 | 2 | **Rhyme Explorer** | Rime perfette, quasi-rime, assonanze, consonanze (IT+EN) | WORD, PHRASE |
-| 3 | **Metric-Aware Rewrite** | Riscritture con 6 stili conservando la metrica | PHRASE, STANZA |
-| 4 | **Emotional Reading** | Emozione testo vs musica + alignment score | PHRASE, STANZA, FULL |
-| 5 | **Corpus Insights** | Associazioni dal corpus, direzioni meno esplorate (mock) | WORD, PHRASE, STANZA |
-| 6 | **Cliche Detector** | Score cliche (0-100) + alternative originali | PHRASE, STANZA |
-| 7 | **Imagery Analyzer** | Radar sensoriale: visual, auditory, tactile, spatial, body | PHRASE, STANZA, FULL |
-| 8 | **Narrative Function** | Ruolo narrativo della strofa (observation, conflict, desire...) | STANZA, CHORUS |
-| 9 | **Repetition Radar** | Parole/simboli ripetuti, campi dominanti | STANZA, FULL |
-| 10 | **Inspiration Directions** | Territori inesplorati, opportunita simboliche, prompt creativi | STANZA, FULL |
+| 3 | **Metric-Aware Rewrite** | Riscritture multi-stile conservando metrica/accenti/ultima parola | PHRASE, STANZA |
+| 4 | **Metric Fit** | Sillabe del testo vs slot melodici (MIDI vocale o euristica BPM) | PHRASE, STANZA, CHORUS |
+| 5 | **Stress Alignment** | Parole forti su posizioni metriche/melodiche forti | PHRASE, CHORUS |
+| 6 | **Hook Strength** | Forza del ritornello/hook + candidati titolo + singability | CHORUS, PHRASE |
+| 7 | **Singability Check** | Righe difficili da cantare (cluster consonantici, plosive, vocali) | PHRASE, CHORUS, STANZA |
+| 8 | **Emotional Reading** | Emozione testo vs musica + alignment + opzioni creative | PHRASE, STANZA, FULL |
+| 9 | **Corpus Insights** | Associazioni astratte da corpus + reference profile (mock) | WORD, PHRASE, STANZA |
+| 10 | **Cliche Detector** | Score cliche (0-100) + alternative originali | PHRASE, STANZA |
+| 11 | **Imagery Analyzer** | Radar sensoriale: visual, auditory, tactile, spatial, body | PHRASE, STANZA, FULL |
+| 12 | **Narrative Function** | Ruolo narrativo della strofa (observation, conflict, desire...) | STANZA, CHORUS |
+| 13 | **Repetition Radar** | Parole/simboli ripetuti, campi dominanti | STANZA, FULL |
+| 14 | **Title Finder** | Titoli ricavati dal testo dell'autore (mai dai riferimenti) | STANZA, CHORUS, FULL |
+| 15 | **Inspiration Directions** | Direzioni creative dall'incrocio di MGX/Cyanite/MIDI/reference/brief | STANZA, FULL |
 
-### Stili di riscrittura (modulo 3)
+### Stili di riscrittura (Metric-Aware Rewrite)
 
-| Stile | Approccio |
-|-------|-----------|
-| Conservative | Sinonimo diretto, struttura identica |
-| Poetic | Vocabolario piu evocativo |
-| Symbolic | Immagine al posto dell'astrazione |
-| Concrete | Oggetto fisico al posto del concetto |
-| Minimal | Riduzione, sottrazione |
-| Narrative | Aggiunta di contesto narrativo |
+`conservative`, `poetic`, `symbolic`, `concrete`, `minimal`, `narrative`, `ironic`, `darker`, `simpler`, `more_singable`.
+
+Controlli `preserve`: `syllable_count`, `main_accents`, `last_word`, `rhyme`, `meaning`, `dominant_image`, `emotional_tone`. Quando è presente **Metric Fit**, i suoi target sillabici vengono passati automaticamente al rewrite.
 
 ### Architettura palette
 
@@ -468,12 +488,17 @@ src/contextual_palette/
     lexical_constellation.py
     rhyme_explorer.py
     metric_rewrite.py
+    metric_fit.py
+    stress_alignment.py
+    hook_strength.py
+    singability_check.py
     emotional_reading.py
     corpus_insights.py
     cliche_detector.py
     imagery_analyzer.py
     narrative_function.py
     repetition_radar.py
+    title_finder.py
     inspiration_directions.py
 ```
 
@@ -491,6 +516,22 @@ Aggiungere un nuovo modulo = creare un file e importarlo in `runner.py`.
 - Conteggio righe, parole, strofe
 - Righe ripetute, parole frequenti
 - Estrazione terminazioni di riga (placeholder rime)
+
+### MIDI Analyzer (`src/midi_analyzer.py`)
+
+- `analyze_vocal_midi(path)` → eventi nota, frasi, range melodico, slot sillabici suggeriti, posizioni forti, profilo di cadenza
+- `analyze_backing_midi(path)` → pitch-class profile, density profile, root accordali probabili
+- Basato su `mido` (puro Python). Fail-soft: se `mido` manca o il file è corrotto, restituisce un dict con `warnings` senza rompere l'app
+
+### Writing Brief (`src/writing_brief.py`)
+
+- `generate_writing_brief(theme_prompt, language, mgx_summary, cyanite)` → brief strutturato (tema, POV, temperatura, scene, campi lessicali, immagini, titoli, ritornelli, archi narrativi)
+- Template-based in mock mode. **Non** genera testi completi
+
+### Reference Profile (`src/reference_profile.py`)
+
+- `build_reference_profile(artists, provider, ...)` → pattern astratti copyright-safe (stance, densità immagini, stile verso/ritornello, registro simbolico, vincoli, avoid)
+- Usa il provider Musixmatch (mock) solo per associazioni a livello di corpus
 
 ### Text Mining (`src/text_mining.py`)
 
@@ -533,12 +574,14 @@ cp .env.example .env
 ```
 
 ```
+PROVIDER_MODE=mock
 MUSIXMATCH_API_KEY=
 CYANITE_API_KEY=
-PROVIDER_MODE=mock
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
 ```
 
-Con `PROVIDER_MODE=mock` (default) tutti i provider sono mock. Aggiungi le API key per attivare quelli reali.
+Con `PROVIDER_MODE=mock` (default) tutti i provider sono mock e l'app è pienamente usabile offline. Aggiungi le API key per attivare i provider reali (Musixmatch/Cyanite) e, in futuro, gli LLM (OpenAI/Claude) per rewrite e brief.
 
 ---
 
@@ -549,8 +592,32 @@ Con `PROVIDER_MODE=mock` (default) tutti i provider sono mock. Aggiungi le API k
 | `outputs/mgx_output.json` | Genoma MGX-v1 |
 | `outputs/mgx_report.md` | Report MGX leggibile |
 | `outputs/lyrics_mining.json` | Risultato text mining |
-| `outputs/full_project.json` | Tutto: MGX + lyrics + mining + cyanite + musixmatch + palette |
+| `outputs/full_project.json` | Stato di progetto unificato: project_meta, inputs, analysis (mgx, cyanite, vocal/backing MIDI, lyrics, prosodia, mining, writing brief, reference profile), writing_studio (palette), exports |
+| `outputs/librettist_report.md` | Report Librettist leggibile (Song Genome, Lyrics, Writing Brief, Reference Profile, Palette, Warnings, Copyright) |
 | `outputs/plots/` | Grafici debug (se abilitati) |
+
+---
+
+## Data model — `full_project.json`
+
+Lo stato di progetto unificato esportato dall'app:
+
+```json
+{
+  "project_meta": { "title": "", "language": "", "created_at": "", "provider_mode": "mock" },
+  "inputs": {
+    "audio_file": "", "vocal_midi_file": "", "backing_midi_file": "",
+    "reference_artists": [], "reference_songs": [], "avoid_references": []
+  },
+  "analysis": {
+    "mgx": {}, "cyanite": {}, "vocal_midi": {}, "backing_midi": {},
+    "lyrics_structure": {}, "lyrics_prosody": {}, "text_mining": {},
+    "writing_brief": {}, "reference_profile": {}
+  },
+  "writing_studio": { "selected_text": "", "selection_type": "", "palette_outputs": {} },
+  "exports": { "mgx_output": "outputs/mgx_output.json", "lyrics_mining": "outputs/lyrics_mining.json", "full_project": "outputs/full_project.json" }
+}
+```
 
 ---
 
@@ -582,8 +649,12 @@ L'autore resta il songwriter. Il sistema e un microscopio e un assistente creati
 - Segmentazione strutturale, non semantica
 - Audio breve (<30s) = meno affidabile
 
+**MIDI:**
+- Parsing euristico via `mido` — nessuna quantizzazione musicale avanzata
+- Le posizioni forti/cadenze sono stime, non analisi metrica formale
+
 **Lyrics / Mining:**
-- Sillabe e rime = euristico basico
+- Sillabe e rime = euristico basico (IT + EN)
 - Stopwords solo EN e IT
 - Nessun NLP avanzato (no POS, no NER)
 
