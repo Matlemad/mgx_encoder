@@ -15,8 +15,6 @@ def generate_report(mgx: dict[str, Any]) -> str:
     lines.append("## Metadata")
     lines.append(f"- **Source**: {meta.get('source', 'unknown')}")
     lines.append(f"- **Filename**: {meta.get('filename', 'N/A')}")
-    if meta.get("youtube_url"):
-        lines.append(f"- **YouTube URL**: {meta['youtube_url']}")
     if meta.get("title"):
         lines.append(f"- **Title**: {meta['title']}")
     lines.append(f"- **Duration**: {meta.get('duration_sec', 0):.1f}s")

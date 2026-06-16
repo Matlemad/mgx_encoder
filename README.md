@@ -6,7 +6,7 @@ MGX Librettist non "genera testi": aiuta il songwriter a scrivere parole che si 
 
 - **MGX audio genome analysis** — analisi strutturale del mix (DSP locale)
 - **MIDI analysis** — analisi opzionale di topline vocale e backing (slot sillabici, cadenze, pitch-class profile)
-- **Cyanite enrichment** — mood, genre, energy, valence (mock, API ready)
+- **Cyanite enrichment** — genere, mood, energy, valence, arousal, strumentazione, BPM, key (API GraphQL reale, con fallback mock)
 - **Lyrics Prompter** — due modalità: testo già scritto (struttura + prosodia + mining) o solo un tema (Writing Brief)
 - **Reference Profile** — astrazione copyright-safe di artisti/canzoni di riferimento
 - **Contextual Palette** — 15 moduli di analisi contestuale attivati dalla selezione del testo
@@ -25,7 +25,7 @@ Il sistema **non** imita artisti viventi o defunti e **non** riproduce testi pro
 ### 1. Prerequisiti
 
 - **Python 3.11+**
-- **ffmpeg** (necessario per yt-dlp e la conversione audio)
+- **ffmpeg** (consigliato per la decodifica/conversione audio di MP3/FLAC)
 - **git** (per clonare la repo)
 
 Installa ffmpeg se non lo hai:
@@ -111,7 +111,6 @@ mgx_encoder/
   src/
     __init__.py
     audio_loader.py             ← caricamento file audio
-    youtube_loader.py           ← download YouTube + cookie
     preprocessing.py            ← HPSS, band splits, tuning, multi-chroma
     multipass.py                ← 6 pass di analisi del segnale
     rhythm.py                   ← R: tempo, groove, swing
@@ -164,15 +163,9 @@ mgx_encoder/
 
 ---
 
-## YouTube Authentication
+## Input audio
 
-YouTube spesso blocca i download senza autenticazione. L'app supporta tre metodi:
-
-1. **Auto-detect** (default) — prova a leggere i cookie dai browser installati
-2. **Selezione browser** — scegli Chrome, Firefox, Safari, Edge o Brave dal dropdown
-3. **File cookies.txt** — fornisci il path a un file in formato Netscape
-
-Per esportare i cookie manualmente: [guida yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp).
+L'app accetta **solo file audio caricati**: `WAV`, `MP3`, `FLAC`. (Il download da YouTube è stato rimosso dal prodotto.)
 
 ---
 
@@ -201,10 +194,9 @@ Informazioni sulla sorgente audio e la sessione di analisi.
 
 | Campo | Tipo | Descrizione |
 |-------|------|-------------|
-| `source` | string | `"file"` o `"youtube"` |
+| `source` | string | `"file"` (sempre, l'app accetta solo upload) |
 | `filename` | string | Nome del file analizzato |
-| `youtube_url` | string / null | URL YouTube se usato |
-| `title` | string / null | Titolo del video YouTube |
+| `title` | string / null | Titolo del brano (metadata manuale) |
 | `duration_sec` | float | Durata in secondi |
 | `sample_rate` | int | Sample rate originale (es. 44100) |
 | `analysis_sample_rate` | int | SR di analisi (sempre 22050) |
@@ -411,11 +403,11 @@ Per confrontare, calcola la **cosine similarity** tra i vettori numerici (interv
 L'app guida l'utente in 5 tab:
 
 ### 1 — Demo Uploader
-Upload del file audio (WAV/MP3/FLAC) o link YouTube, più MIDI opzionali e metadata manuali. Il sistema:
+Upload del **file audio** (WAV/MP3/FLAC), più MIDI opzionali e metadata manuali. Il sistema:
 - Estrae il genoma musicale MGX-v1 (R, M, H, X, F, C)
 - Analizza MIDI vocale (slot sillabici, frasi, cadenza) e backing (pitch-class profile, root) se forniti
-- Arricchisce con dati Cyanite (mock): mood, genre, energy, valence, instrumentation
-- Mostra la **Song Genome Summary**: BPM, time signature, key/mode + confidence, mood/energy/valence, sezioni, contorno melodico, warning
+- Arricchisce con **Cyanite** (analisi audio reale via GraphQL quando `CYANITE_MODE=graphql` + API key; altrimenti mock): genere/sottogeneri, mood, energy, valence, arousal, strumentazione, BPM, key, time signature. Se la chiamata live fallisce, **ricade automaticamente sul mock** con un avviso.
+- Mostra la **Song Genome Summary** unificata: BPM/Key confrontati **MGX vs Cyanite vs scelto**, time signature, mood/energy/valence/arousal, genere/sottogenere, strumentazione, sezioni/forma (MGX), contorno melodico, warning e note di confidenza. La risposta GraphQL raw resta solo in un expander di debug.
 
 ### 2 — Lyrics Prompter
 Due modalità:
@@ -589,11 +581,11 @@ Funzioni principali in `src/providers/cyanite.py`:
 
 I descrittori restituiti (`normalize_analysis_result`) sono copyright-safe: genere/sottogeneri, mood (`moodTags`/`moodAdvancedTags`), movimento, carattere, strumenti, voce, `energyLevel`, `valence`, `arousal`, `keyPrediction {value, confidence}`, `bpmPrediction {value, confidence}`, `timeSignature`, era musicale, una caption. Nessun testo, nessun audio salvato.
 
-Nella tab **5 · Export → Provider debug** trovi due controlli reali:
+**Integrazione nel flusso principale (Tab 1):** quando clicchi **Analyze Demo**, dopo l'analisi locale MGX l'app esegue automaticamente l'analisi Cyanite reale se `CYANITE_MODE=graphql` e `CYANITE_API_KEY` è presente. In caso di errore (rete, timeout, stato `Failed`) **ricade sul mock** mostrando un avviso con la causa. Il risultato finisce in `analysis.cyanite`, la sorgente in `analysis.cyanite_source` (`cyanite_live` / `cyanite_mock_fallback` / `cyanite_mock`), e i descrittori confluiscono nella Song Genome Summary.
+
+Resta inoltre disponibile la tab **5 · Export → Provider debug** con due controlli di test:
 - **Test Cyanite credentials** → verifica connettività (`ping`).
 - **Run Cyanite analysis (real)** → analizza l'audio del demo (o un file caricato) e mostra i descrittori normalizzati + la risposta raw.
-
-> Nota: l'app principale (Tab 1) usa ancora l'arricchimento Cyanite **mock** per non alterare il flusso esistente; l'analisi reale è disponibile nel pannello debug ed è pronta per essere integrata nel flusso principale.
 
 ### LLM Provider (`src/contextual_palette/llm_provider.py`)
 
@@ -697,7 +689,7 @@ In locale (non su Vercel) gli eventi ricevuti vengono accodati in `outputs/cyani
 | `outputs/mgx_output.json` | Genoma MGX-v1 |
 | `outputs/mgx_report.md` | Report MGX leggibile |
 | `outputs/lyrics_mining.json` | Risultato text mining |
-| `outputs/full_project.json` | Stato di progetto unificato: project_meta, inputs, analysis (mgx, cyanite, vocal/backing MIDI, lyrics, prosodia, mining, writing brief, reference profile), writing_studio (palette), exports |
+| `outputs/full_project.json` | Stato di progetto unificato: project_meta, inputs, analysis (mgx, cyanite, cyanite_source, song_genome_summary, vocal/backing MIDI, lyrics, prosodia, mining, writing brief, reference profile), writing_studio (palette), exports |
 | `outputs/librettist_report.md` | Report Librettist leggibile (Song Genome, Lyrics, Writing Brief, Reference Profile, Palette, Warnings, Copyright) |
 | `outputs/plots/` | Grafici debug (se abilitati) |
 
@@ -715,7 +707,10 @@ Lo stato di progetto unificato esportato dall'app:
     "reference_artists": [], "reference_songs": [], "avoid_references": []
   },
   "analysis": {
-    "mgx": {}, "cyanite": {}, "vocal_midi": {}, "backing_midi": {},
+    "mgx": {}, "cyanite": {},
+    "cyanite_source": "cyanite_live | cyanite_mock_fallback | cyanite_mock",
+    "song_genome_summary": {},
+    "vocal_midi": {}, "backing_midi": {},
     "lyrics_structure": {}, "lyrics_prosody": {}, "text_mining": {},
     "writing_brief": {}, "reference_profile": {}
   },

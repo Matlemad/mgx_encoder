@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from src.audio_loader import load_audio
-from src.youtube_loader import download_audio_from_youtube, is_valid_youtube_url
 from src.preprocessing import preprocess
 from src.rhythm import analyze_rhythm
 from src.melody import analyze_melody
@@ -51,7 +50,7 @@ PROVIDER_MODE = os.environ.get("PROVIDER_MODE", "mock")
 _DEFAULTS = {
     "project_meta": {"title": "", "language": "auto", "created_at": "", "provider_mode": PROVIDER_MODE},
     "mgx_output": None, "mgx_json_str": None, "mgx_report_text": None,
-    "cyanite_result": None, "musixmatch_result": None,
+    "cyanite_result": None, "cyanite_source": None, "cyanite_raw": None, "musixmatch_result": None,
     "vocal_midi": None, "backing_midi": None,
     "lyrics_result": None, "mining_result": None, "prosody_result": None,
     "writing_brief": None, "reference_profile": None,
@@ -74,14 +73,50 @@ def _save_upload(uploaded, suffix: str = "") -> str:
     return str(tmp)
 
 
+def run_cyanite_enrichment(audio_path: str | None, title: str | None = None, progress_cb=None):
+    """Run Cyanite enrichment for the main flow with graceful fallback.
+
+    Returns (descriptors: dict, source: str, raw: dict | None) where source is
+    one of: "cyanite_live", "cyanite_mock_fallback", "cyanite_mock".
+    """
+    def _mock(reason: str | None = None):
+        mock = MockCyanite()
+        data = mock.analyze_audio(audio_path or "mock")
+        data["tags"] = mock.similarity_tags(audio_path or "mock")
+        if reason:
+            data["_fallback_reason"] = reason
+        return data
+
+    mode = os.environ.get("CYANITE_MODE", "").strip().lower()
+    has_key = bool(os.environ.get("CYANITE_API_KEY", "").strip())
+
+    if mode == "graphql" and has_key and audio_path:
+        try:
+            from src.providers.cyanite import analyze_audio_file
+            out = analyze_audio_file(audio_path, title=title, progress_cb=progress_cb)
+            if out.get("ok") and out.get("analysis"):
+                return out["analysis"], "cyanite_live", out.get("raw")
+            return _mock(out.get("message")), "cyanite_mock_fallback", None
+        except Exception as exc:  # noqa: BLE001 - never break the main flow
+            return _mock(str(exc)), "cyanite_mock_fallback", None
+
+    return _mock(), "cyanite_mock"
+
+
 def build_full_project() -> dict:
     """Assemble the unified project state JSON."""
+    genome = build_song_genome_summary(
+        st.session_state.mgx_output, st.session_state.cyanite_result,
+        st.session_state.vocal_midi, st.session_state.cyanite_source,
+    ) if st.session_state.mgx_output else {}
     return {
         "project_meta": st.session_state.project_meta,
         "inputs": st.session_state.inputs,
         "analysis": {
             "mgx": st.session_state.mgx_output or {},
             "cyanite": st.session_state.cyanite_result or {},
+            "cyanite_source": st.session_state.cyanite_source,
+            "song_genome_summary": genome,
             "vocal_midi": st.session_state.vocal_midi or {},
             "backing_midi": st.session_state.backing_midi or {},
             "lyrics_structure": st.session_state.lyrics_result or {},
@@ -140,14 +175,7 @@ with tab_demo:
     st.header("Demo Uploader")
     st.caption("Upload your demo audio (required). Optionally add vocal/backing MIDI and manual metadata.")
 
-    col_file, col_yt = st.columns(2)
-    with col_file:
-        uploaded_file = st.file_uploader("Demo audio — WAV / MP3 / FLAC", type=["wav", "mp3", "flac"], key="audio_upload")
-    with col_yt:
-        yt_url = st.text_input("Or paste a YouTube link", key="yt_url")
-        with st.expander("YouTube auth"):
-            yt_browser = st.selectbox("Cookies from", ["auto-detect", "chrome", "firefox", "safari", "edge", "brave", "none"], key="yt_browser")
-            yt_cookies_file = st.text_input("cookies.txt path", key="yt_cookies_file")
+    uploaded_file = st.file_uploader("Demo audio — WAV / MP3 / FLAC", type=["wav", "mp3", "flac"], key="audio_upload")
 
     col_vm, col_bm = st.columns(2)
     with col_vm:
@@ -168,25 +196,12 @@ with tab_demo:
 
     if run_btn:
         ensure_dir(OUTPUTS_DIR); ensure_dir(TEMP_DIR)
-        audio_path = None; source = "file"; yt_title = None; yt_url_used = None; meta_notes_list = []
+        audio_path = None; source = "file"; meta_notes_list = []
 
         if uploaded_file is not None:
             audio_path = _save_upload(uploaded_file)
-        elif yt_url and yt_url.strip():
-            if not is_valid_youtube_url(yt_url.strip()):
-                st.error("Invalid YouTube URL."); st.stop()
-            with st.spinner("Downloading from YouTube..."):
-                try:
-                    _br = yt_browser if yt_browser not in ("auto-detect", "none") else None
-                    _ck = yt_cookies_file.strip() or None
-                    yt_result = download_audio_from_youtube(yt_url.strip(), output_dir=TEMP_DIR,
-                        cookies_from_browser=_br if _br else None, cookies_file=_ck)
-                    audio_path = yt_result["audio_path"]; yt_title = yt_result.get("title")
-                    yt_url_used = yt_url.strip(); source = "youtube"
-                except Exception as e:
-                    st.error(f"YouTube download failed: {e}"); st.stop()
         else:
-            st.info("Upload a file or paste a URL to continue."); st.stop()
+            st.info("Upload an audio file (WAV / MP3 / FLAC) to continue."); st.stop()
 
         # Optional MIDI parsing (fails softly)
         if vocal_midi_up is not None:
@@ -220,8 +235,8 @@ with tab_demo:
 
         if meta_notes:
             meta_notes_list.append(f"User note: {meta_notes}")
-        meta = {"source": source, "filename": audio_data["filename"], "youtube_url": yt_url_used,
-                "title": meta_title or yt_title, "language": meta_lang,
+        meta = {"source": source, "filename": audio_data["filename"],
+                "title": meta_title, "language": meta_lang,
                 "declared_bpm": meta_bpm, "declared_key": meta_key,
                 "duration_sec": round(audio_data["duration_sec"], 2),
                 "sample_rate": audio_data["original_sr"], "analysis_sample_rate": audio_data["sr"],
@@ -239,10 +254,11 @@ with tab_demo:
         def _strip(d): return {k: v for k, v in d.items() if k != "pass_details"}
         mgx_output = {"meta": meta, "R": _strip(R), "M": _strip(M), "H": _strip(H), "X": _strip(X), "F": _strip(F), "C": C_data}
 
-        progress.progress(90, text="Cyanite enrichment (mock)...")
-        mock_cy = MockCyanite()
-        cy_data = mock_cy.analyze_audio(audio_path or "mock")
-        cy_data["tags"] = mock_cy.similarity_tags(audio_path or "mock")
+        progress.progress(90, text="Cyanite enrichment...")
+        cy_data, cy_source, cy_raw = run_cyanite_enrichment(
+            audio_path, title=meta_title or None,
+            progress_cb=lambda m: progress.progress(92, text=f"Cyanite: {m}"),
+        )
 
         progress.progress(100, text="Done!")
         save_json(mgx_output, OUTPUTS_DIR / "mgx_output.json")
@@ -253,11 +269,13 @@ with tab_demo:
         st.session_state.mgx_json_str = json.dumps(mgx_output, indent=2, cls=NumpyEncoder, ensure_ascii=False)
         st.session_state.mgx_report_text = report_text
         st.session_state.cyanite_result = cy_data
+        st.session_state.cyanite_source = cy_source
+        st.session_state.cyanite_raw = cy_raw
         st.session_state.R = R; st.session_state.M = M; st.session_state.H = H
         st.session_state.X = X; st.session_state.F = F; st.session_state.C_data = C_data
         st.session_state.inputs["audio_file"] = audio_path
         st.session_state.project_meta.update({
-            "title": meta_title or yt_title or "",
+            "title": meta_title or "",
             "language": meta_lang,
             "created_at": datetime.now().isoformat(timespec="seconds"),
             "provider_mode": PROVIDER_MODE,
@@ -266,20 +284,60 @@ with tab_demo:
     # ── Song Genome Summary ──
     if st.session_state.mgx_output:
         mgx = st.session_state.mgx_output
-        genome = build_song_genome_summary(mgx, st.session_state.cyanite_result, st.session_state.vocal_midi)
+        cy_source = st.session_state.cyanite_source
+        genome = build_song_genome_summary(mgx, st.session_state.cyanite_result,
+                                           st.session_state.vocal_midi, cy_source)
         st.success("Demo analyzed — Song Genome Summary")
+
+        _cy_badge = {
+            "cyanite_live": "Cyanite: live",
+            "cyanite_mock_fallback": "Cyanite: mock (live failed)",
+            "cyanite_mock": "Cyanite: mock",
+        }.get(cy_source, "Cyanite: mock")
+        if cy_source == "cyanite_live":
+            st.caption(f":green[{_cy_badge}]")
+        elif cy_source == "cyanite_mock_fallback":
+            reason = (st.session_state.cyanite_result or {}).get("_fallback_reason", "unknown error")
+            st.warning(f"Cyanite live analysis failed — using mock data. Reason: {reason}")
+        else:
+            st.caption(_cy_badge)
+
         c1, c2, c3, c4 = st.columns(4)
         bpm = genome.get("bpm")
         c1.metric("BPM", f"{bpm:.0f}" if isinstance(bpm, (int, float)) else "?")
-        c2.metric("Key", f"{genome.get('key', '?')} {genome.get('mode', '')}")
+        c2.metric("Key", genome.get("key_sources", {}).get("chosen") or "?")
         oc = genome.get("overall_confidence")
         c3.metric("Confidence", f"{oc:.0%}" if isinstance(oc, (int, float)) else "?")
-        c4.metric("Mood (mock)", genome.get("mood", "?") or "?")
+        c4.metric("Mood", genome.get("mood") or "?")
 
-        cc1, cc2, cc3 = st.columns(3)
-        cc1.caption(f"Time signature: {genome.get('time_signature')}")
-        cc2.caption(f"Melodic contour: {genome.get('melodic_contour')}")
-        cc3.caption(f"Form: {genome.get('form_sections')}")
+        # MGX vs Cyanite vs chosen
+        bs = genome.get("bpm_sources", {}); ks = genome.get("key_sources", {})
+        d1, d2 = st.columns(2)
+        d1.caption(f"**BPM** — MGX: {bs.get('mgx')} · Cyanite: {bs.get('cyanite')} · chosen: {bs.get('chosen')}")
+        d2.caption(f"**Key** — MGX: {ks.get('mgx')} · Cyanite: {ks.get('cyanite')} · chosen: {ks.get('chosen')}")
+
+        e1, e2, e3, e4 = st.columns(4)
+        e1.caption(f"Energy: {genome.get('energy')}")
+        e2.caption(f"Valence: {genome.get('valence')}")
+        e3.caption(f"Arousal: {genome.get('arousal')}")
+        e4.caption(f"Time signature: {genome.get('time_signature')}")
+
+        g1, g2 = st.columns(2)
+        _genres = genome.get("genres") or []
+        _subs = genome.get("subgenres") or []
+        g1.caption(f"Genre: {', '.join(_genres) if _genres else genome.get('genre') or '—'}"
+                   + (f" · subgenre: {', '.join(_subs)}" if _subs else ""))
+        _instr = genome.get("instrumentation") or []
+        g2.caption(f"Instrumentation: {', '.join(_instr) if _instr else '—'}")
+
+        f1, f2 = st.columns(2)
+        f1.caption(f"Melodic contour: {genome.get('melodic_contour')}")
+        f2.caption(f"Form: {genome.get('form_sections')}")
+        if genome.get("cyanite_caption"):
+            st.caption(f"Cyanite caption: _{genome.get('cyanite_caption')}_")
+
+        for w in genome.get("warnings", []) or []:
+            st.caption(f":orange[⚠ {w}]")
 
         if st.session_state.vocal_midi:
             vm = st.session_state.vocal_midi
@@ -296,8 +354,11 @@ with tab_demo:
         with st.expander("Full MGX details"):
             st.json(mgx)
         if st.session_state.cyanite_result:
-            with st.expander("Cyanite enrichment (mock)"):
+            with st.expander(f"Cyanite descriptors ({cy_source or 'mock'})"):
                 st.json(st.session_state.cyanite_result)
+        if st.session_state.cyanite_raw:
+            with st.expander("Cyanite raw GraphQL response (debug)"):
+                st.json(st.session_state.cyanite_raw)
         if st.session_state.backing_midi:
             with st.expander("Backing MIDI analysis"):
                 st.json(st.session_state.backing_midi)
