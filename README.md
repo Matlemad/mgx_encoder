@@ -559,7 +559,7 @@ Aggiungere un nuovo modulo = creare un file e importarlo in `runner.py`.
 | `mock_musixmatch.py` | Implementato | Dati finti: temi, artisti correlati, associazioni, usage patterns |
 | `mock_cyanite.py` | Implementato | Dati finti: mood, genre, energy, valence, instrumentation, tags |
 | `musixmatch.py` | **Implementato (live)** | API Musixmatch reale via **Analysis API** — solo pattern astratti (moods/themes/entities), mai testi |
-| `cyanite.py` | Stub | Legge `CYANITE_API_KEY`, raise se assente |
+| `cyanite.py` | **Implementato (live)** | API Cyanite reale via **GraphQL** — test credenziali + analisi audio (upload → analisi → descrittori astratti) |
 
 ### Musixmatch (live)
 
@@ -576,6 +576,24 @@ Quando inserisci artisti nella tab **References**, il profilo viene marcato come
 **Copyright safety:** il provider scarta deliberatamente qualsiasi frammento letterale di testo (es. `themes[].quotes`). Espone solo descrittori astratti. Autenticazione via parametro `apikey` su `https://api.musixmatch.com/ws/1.1/`.
 
 Se la chiamata live fallisce (rete, chiave non valida, limiti di piano), l'app ricade automaticamente sul provider mock con un avviso.
+
+### Cyanite (live, GraphQL)
+
+Provider audio reale via API **GraphQL** (`https://api.cyanite.ai/graphql`), autenticazione `Authorization: Bearer <CYANITE_API_KEY>`. Si attiva con `CYANITE_MODE=graphql`.
+
+Funzioni principali in `src/providers/cyanite.py`:
+
+- `cyanite_graphql_request(query, variables)` → POST GraphQL riutilizzabile, con gestione di errori di rete, HTTP, `401/403` e array `errors` GraphQL.
+- `test_cyanite_credentials()` → test leggero (`query { ping }`); non solleva eccezioni, ritorna `{ok, mode, api_url, message, raw}`.
+- `analyze_audio_file(path)` → flusso completo: `fileUploadRequest` → PUT dei byte audio → `libraryTrackCreate` (auto-enqueue di `AudioAnalysisV7`) → polling di `libraryTrack(id)` → estrazione dei **descrittori astratti**.
+
+I descrittori restituiti (`normalize_analysis_result`) sono copyright-safe: genere/sottogeneri, mood (`moodTags`/`moodAdvancedTags`), movimento, carattere, strumenti, voce, `energyLevel`, `valence`, `arousal`, `keyPrediction {value, confidence}`, `bpmPrediction {value, confidence}`, `timeSignature`, era musicale, una caption. Nessun testo, nessun audio salvato.
+
+Nella tab **5 · Export → Provider debug** trovi due controlli reali:
+- **Test Cyanite credentials** → verifica connettività (`ping`).
+- **Run Cyanite analysis (real)** → analizza l'audio del demo (o un file caricato) e mostra i descrittori normalizzati + la risposta raw.
+
+> Nota: l'app principale (Tab 1) usa ancora l'arricchimento Cyanite **mock** per non alterare il flusso esistente; l'analisi reale è disponibile nel pannello debug ed è pronta per essere integrata nel flusso principale.
 
 ### LLM Provider (`src/contextual_palette/llm_provider.py`)
 
@@ -594,7 +612,10 @@ cp .env.example .env
 ```
 PROVIDER_MODE=real
 MUSIXMATCH_API_KEY=la_tua_chiave
-CYANITE_API_KEY=
+CYANITE_API_KEY=il_tuo_access_token
+CYANITE_API_URL=https://api.cyanite.ai/graphql
+CYANITE_MODE=graphql
+CYANITE_WEBHOOK_SECRET=il_tuo_webhook_secret
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 ```
@@ -665,7 +686,7 @@ curl -X POST http://localhost:8000/api/cyanite/webhook \
 
 In locale (non su Vercel) gli eventi ricevuti vengono accodati in `outputs/cyanite_webhook_events.jsonl`. Su Vercel la scrittura su filesystem viene saltata (FS effimero/read-only).
 
-> Nota: questo è solo l'endpoint webhook. Il flusso completo di upload/analisi Cyanite e l'arricchimento reale (al posto del mock) saranno il prossimo step.
+> Nota: questo è solo l'endpoint webhook (riceve gli eventi). Il flusso reale di upload/analisi e il fetch dei risultati sono già implementati lato app in `src/providers/cyanite.py` (polling di `libraryTrack`). Collegare il webhook in modo che, all'evento `finished`, recuperi automaticamente i risultati è il prossimo step.
 
 ---
 
@@ -750,7 +771,7 @@ L'autore resta il songwriter. Il sistema e un microscopio e un assistente creati
 
 **Provider:**
 - Musixmatch: **integrazione reale** via Analysis API (con `PROVIDER_MODE=real` + chiave); fallback mock automatico
-- Cyanite: ancora mock
+- Cyanite: **integrazione reale** via GraphQL (con `CYANITE_MODE=graphql` + access token) — test credenziali e analisi audio nel pannello debug; il flusso principale usa ancora il mock
 - LLM provider: mock (futuro: OpenAI/Claude)
 - `related_artists` di Musixmatch è euristico per genere (l'API non espone un endpoint "related")
 
