@@ -1,0 +1,28 @@
+# Vercel deploys ONLY the serverless function in api/.
+# The Streamlit app and its heavy analysis dependencies do NOT run on Vercel,
+# so we keep them out of the deployment to avoid the build trying to treat
+# app.py as a Python entrypoint and to skip installing librosa/streamlit/etc.
+
+# Streamlit application + analysis code
+app.py
+src/
+examples/
+samples/
+notebooks/
+*.ipynb
+
+# Heavy Python deps (the webhook needs only the standard library)
+requirements.txt
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Runtime artifacts / local data
+outputs/
+temp/
+*.log
+
+# Docs & misc (not needed by the function)
+*.md
+.DS_Store

@@ -611,7 +611,8 @@ Il file `.env` è già in `.gitignore`: **non committare mai le chiavi**. Le var
 Cyanite notifica via webhook quando l'analisi audio cambia stato (es. `finished` / `failed`). È disponibile un endpoint serverless minimale, pronto per il deploy su Vercel:
 
 ```
-api/cyanite/webhook.py        ← funzione Python serverless (a repo root)
+api/cyanite/webhook.py        ← funzione Python serverless (dentro al repo mgx_encoder)
+.vercelignore                 ← esclude l'app Streamlit dal deploy Vercel
 ```
 
 URL finale dopo il deploy:
@@ -635,7 +636,8 @@ CYANITE_API_URL=https://api.cyanite.ai/graphql
 
 ### Deploy su Vercel
 
-1. Fai il deploy del progetto su Vercel impostando la **Root Directory = root del repo** (la cartella che contiene `api/`). Vercel rileva automaticamente `api/**/*.py` come funzioni Python (nessun `vercel.json` necessario; l'endpoint usa solo la stdlib).
+1. Il repo GitHub deployato è `mgx_encoder`, quindi lascia la **Root Directory = `.` (root del repo)**: è la cartella che contiene sia `app.py` sia `api/`. Vercel rileva automaticamente `api/**/*.py` come funzioni Python (l'endpoint usa solo la stdlib).
+   - Il file `.vercelignore` esclude dal deploy `app.py`, `src/` e `requirements.txt` (Streamlit non gira su Vercel). Questo evita l'errore *"Found app.py but it does not export a top-level app/application/handler"* e impedisce l'installazione di dipendenze pesanti (librosa, ecc.). **Non** impostare la Root Directory su una sottocartella.
 2. Copia l'URL deployato: `https://<domain>/api/cyanite/webhook`
 3. Invia questo URL a Cyanite per ottenere le credenziali API (access token + webhook secret).
 4. Aggiungi `CYANITE_API_KEY` e `CYANITE_WEBHOOK_SECRET` ottenuti nelle **Environment Variables** di Vercel.
