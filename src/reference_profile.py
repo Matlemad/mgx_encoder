@@ -121,7 +121,33 @@ def build_reference_profile(
             symbolic.extend(_REGISTER_PATTERNS[r]["symbolic_register"])
         symbolic = list(dict.fromkeys(symbolic))
 
-    # Corpus-level theme associations via provider (abstract only).
+    # Artist-grounded abstraction: query the real catalog of the named artists
+    # via the provider's Analysis API (abstract patterns only, no lyrics).
+    from collections import Counter
+
+    artist_profiles: list[dict[str, Any]] = []
+    grounded_themes: Counter = Counter()
+    grounded_moods: Counter = Counter()
+    grounded_entities: Counter = Counter()
+    grounded_genres: Counter = Counter()
+
+    if provider is not None and hasattr(provider, "artist_analysis_profile") and artists:
+        for artist in artists[:3]:  # cap API usage
+            try:
+                prof = provider.artist_analysis_profile(artist, n_tracks=5)
+            except Exception:  # noqa: BLE001
+                continue
+            if not prof or not prof.get("n_tracks_analyzed"):
+                continue
+            artist_profiles.append(prof)
+            grounded_themes.update(prof.get("themes", []))
+            grounded_moods.update(prof.get("moods", []))
+            grounded_entities.update(prof.get("entities", []))
+            grounded_genres.update(prof.get("genres", []))
+
+    grounded = bool(artist_profiles)
+
+    # Corpus-level theme associations via provider (fallback / enrichment).
     if provider is not None:
         try:
             seed_themes = genre_tags or ["love", "night", "city"]
@@ -132,8 +158,20 @@ def build_reference_profile(
         except Exception:  # noqa: BLE001
             pass
 
+    if grounded:
+        # Real artist data takes precedence in the abstraction.
+        common_themes = [t for t, _ in grounded_themes.most_common(8)] + common_themes
+        lexical_fields = (
+            [t for t, _ in grounded_themes.most_common(10)]
+            + [e for e, _ in grounded_entities.most_common(6)]
+            + lexical_fields
+        )
+        symbolic = [e for e, _ in grounded_entities.most_common(8)] + symbolic
+
     common_themes = [t for t in dict.fromkeys(common_themes) if t]
     lexical_fields = list(dict.fromkeys(lexical_fields))
+    symbolic = list(dict.fromkeys(symbolic))
+    dominant_moods = [m for m, _ in grounded_moods.most_common(6)]
 
     creative_constraints = []
     if blended.get("chorus_style"):
@@ -142,6 +180,14 @@ def build_reference_profile(
         creative_constraints.append(f"Build verses that are {blended['verse_style']}.")
     if blended.get("imagery_density"):
         creative_constraints.append(f"Target imagery density: {blended['imagery_density']}.")
+    if grounded and dominant_moods:
+        creative_constraints.append(
+            f"References' real catalog leans toward moods: {', '.join(dominant_moods[:4])}."
+        )
+    if grounded and common_themes:
+        creative_constraints.append(
+            f"Recurring themes in the references: {', '.join(common_themes[:5])}."
+        )
 
     avoid = [f"Do not imitate the specific style of {a}." for a in avoid_artists]
     avoid.append("Avoid reproducing any recognizable melodic or lyrical phrase from references.")
@@ -149,9 +195,12 @@ def build_reference_profile(
     return {
         "artists": artists,
         "reference_songs": reference_songs or [],
+        "grounded_in_real_catalog": grounded,
+        "reference_artist_profiles": artist_profiles,
         "abstract_patterns": {
             "common_themes": common_themes or ["connection", "place", "change"],
             "lexical_fields": lexical_fields or blended.get("symbolic_register", []),
+            "dominant_moods": dominant_moods,
             "imagery_density": blended.get("imagery_density", ""),
             "narrative_stance": blended.get("narrative_stance", ""),
             "typical_energy": blended.get("typical_energy", ""),

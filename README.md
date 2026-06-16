@@ -131,9 +131,10 @@ mgx_encoder/
     utils.py                    ← helper
     providers/
       base.py                   ← interfacce astratte
+      factory.py                ← selezione real/mock + fallback (carica .env)
       mock_musixmatch.py        ← dati mock corpus
       mock_cyanite.py           ← dati mock audio enrichment
-      musixmatch.py             ← stub per API reale
+      musixmatch.py             ← API Musixmatch reale (Analysis API)
       cyanite.py                ← stub per API reale
     contextual_palette/
       selection_analyzer.py     ← classifica tipo di selezione
@@ -554,10 +555,27 @@ Aggiungere un nuovo modulo = creare un file e importarlo in `runner.py`.
 | File | Stato | Descrizione |
 |------|-------|-------------|
 | `base.py` | Implementato | Interfacce astratte `LyricsCorpusProvider`, `MusicAnalysisProvider` |
+| `factory.py` | Implementato | Sceglie provider reale/mock in base a `PROVIDER_MODE` + chiavi, con fallback |
 | `mock_musixmatch.py` | Implementato | Dati finti: temi, artisti correlati, associazioni, usage patterns |
 | `mock_cyanite.py` | Implementato | Dati finti: mood, genre, energy, valence, instrumentation, tags |
-| `musixmatch.py` | Stub | Legge `MUSIXMATCH_API_KEY`, raise se assente |
+| `musixmatch.py` | **Implementato (live)** | API Musixmatch reale via **Analysis API** — solo pattern astratti (moods/themes/entities), mai testi |
 | `cyanite.py` | Stub | Legge `CYANITE_API_KEY`, raise se assente |
+
+### Musixmatch (live)
+
+Il provider reale usa principalmente `track.lyrics.analysis.search` (Analysis API), che restituisce dati astratti a livello di corpus:
+
+- `search_by_theme(themes)` → temi/mood/generi co-occorrenti reali per ciascun seed
+- `artist_analysis_profile(artist)` → analizza i brani reali (top tracks) dell'artista citato e aggrega temi/mood/entità/generi. **Questo àncora il Reference Profile al vero catalogo degli artisti di riferimento**, non a pattern generici, restando astratto e copyright-safe
+- `lexical_associations(word)` → temi ed entità che co-occorrono con la parola
+- `usage_patterns(word)` → pattern astratti (mood dominanti, generi tipici, temi correlati)
+- `related_artists(artist)` → euristica per genere (Musixmatch non ha un endpoint "related" diretto)
+
+Quando inserisci artisti nella tab **References**, il profilo viene marcato come *grounded in real catalog* e mostra, per ciascun artista, i temi/mood/generi/entità ricavati dai suoi brani reali — sempre come descrittori astratti, mai testi.
+
+**Copyright safety:** il provider scarta deliberatamente qualsiasi frammento letterale di testo (es. `themes[].quotes`). Espone solo descrittori astratti. Autenticazione via parametro `apikey` su `https://api.musixmatch.com/ws/1.1/`.
+
+Se la chiamata live fallisce (rete, chiave non valida, limiti di piano), l'app ricade automaticamente sul provider mock con un avviso.
 
 ### LLM Provider (`src/contextual_palette/llm_provider.py`)
 
@@ -574,14 +592,78 @@ cp .env.example .env
 ```
 
 ```
-PROVIDER_MODE=mock
-MUSIXMATCH_API_KEY=
+PROVIDER_MODE=real
+MUSIXMATCH_API_KEY=la_tua_chiave
 CYANITE_API_KEY=
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 ```
 
-Con `PROVIDER_MODE=mock` (default) tutti i provider sono mock e l'app è pienamente usabile offline. Aggiungi le API key per attivare i provider reali (Musixmatch/Cyanite) e, in futuro, gli LLM (OpenAI/Claude) per rewrite e brief.
+- `PROVIDER_MODE=mock` → tutti i provider sono mock, app pienamente usabile offline.
+- `PROVIDER_MODE=real` → per ogni provider, usa l'API reale se la relativa chiave è presente, altrimenti ricade sul mock.
+
+Il file `.env` è già in `.gitignore`: **non committare mai le chiavi**. Le variabili vengono caricate automaticamente con `python-dotenv`. Lo stato dei provider (live/mock) è mostrato in cima all'app.
+
+---
+
+## Cyanite Webhook Setup
+
+Cyanite notifica via webhook quando l'analisi audio cambia stato (es. `finished` / `failed`). È disponibile un endpoint serverless minimale, pronto per il deploy su Vercel:
+
+```
+api/cyanite/webhook.py        ← funzione Python serverless (a repo root)
+```
+
+URL finale dopo il deploy:
+
+```
+https://<vercel-app-domain>/api/cyanite/webhook
+```
+
+L'endpoint accetta `POST` (eventi Cyanite), espone un healthcheck `GET`, verifica la firma `Signature` (**HMAC-SHA512** del raw body) se `CYANITE_WEBHOOK_SECRET` è impostato, logga l'evento e risponde **200** rapidamente (Cyanite annulla la richiesta dopo ~3s). Non scarica ancora i risultati dell'analisi.
+
+### Variabili d'ambiente
+
+```
+CYANITE_WEBHOOK_SECRET=
+CYANITE_API_KEY=
+CYANITE_API_URL=https://api.cyanite.ai/graphql
+```
+
+- Se `CYANITE_WEBHOOK_SECRET` è assente, l'endpoint accetta comunque l'evento ma logga un avviso (gli eventi di test della web-app Cyanite non includono la firma).
+- `CYANITE_API_KEY` non è ancora usata dal webhook (servirà al prossimo step di integrazione).
+
+### Deploy su Vercel
+
+1. Fai il deploy del progetto su Vercel impostando la **Root Directory = root del repo** (la cartella che contiene `api/`). Vercel rileva automaticamente `api/**/*.py` come funzioni Python (nessun `vercel.json` necessario; l'endpoint usa solo la stdlib).
+2. Copia l'URL deployato: `https://<domain>/api/cyanite/webhook`
+3. Invia questo URL a Cyanite per ottenere le credenziali API (access token + webhook secret).
+4. Aggiungi `CYANITE_API_KEY` e `CYANITE_WEBHOOK_SECRET` ottenuti nelle **Environment Variables** di Vercel.
+5. **Redeploy** dopo aver impostato le variabili d'ambiente.
+6. Testa l'endpoint:
+
+```bash
+curl -X GET https://<domain>/api/cyanite/webhook
+
+curl -X POST https://<domain>/api/cyanite/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"version":"2","resource":{"type":"LibraryTrack","id":"test"},"event":{"type":"AudioAnalysisV7","status":"finished"}}'
+```
+
+### Test locale
+
+```bash
+python api/cyanite/webhook.py     # serve su http://localhost:8000
+
+curl http://localhost:8000/api/cyanite/webhook
+curl -X POST http://localhost:8000/api/cyanite/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"version":"2","resource":{"type":"LibraryTrack","id":"test"},"event":{"type":"AudioAnalysisV7","status":"finished"}}'
+```
+
+In locale (non su Vercel) gli eventi ricevuti vengono accodati in `outputs/cyanite_webhook_events.jsonl`. Su Vercel la scrittura su filesystem viene saltata (FS effimero/read-only).
+
+> Nota: questo è solo l'endpoint webhook. Il flusso completo di upload/analisi Cyanite e l'arricchimento reale (al posto del mock) saranno il prossimo step.
 
 ---
 
@@ -665,8 +747,10 @@ L'autore resta il songwriter. Il sistema e un microscopio e un assistente creati
 - Imagery analyzer basato su keyword, non su comprensione semantica profonda
 
 **Provider:**
-- Musixmatch e Cyanite sono mock
-- LLM provider e mock (futuro: OpenAI/Claude)
+- Musixmatch: **integrazione reale** via Analysis API (con `PROVIDER_MODE=real` + chiave); fallback mock automatico
+- Cyanite: ancora mock
+- LLM provider: mock (futuro: OpenAI/Claude)
+- `related_artists` di Musixmatch è euristico per genere (l'API non espone un endpoint "related")
 
 ---
 

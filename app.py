@@ -6,6 +6,12 @@ import os
 from pathlib import Path
 from datetime import datetime
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 import streamlit as st
 import matplotlib
 matplotlib.use("Agg")
@@ -28,8 +34,8 @@ from src.midi_analyzer import analyze_vocal_midi, analyze_backing_midi
 from src.writing_brief import generate_writing_brief
 from src.reference_profile import build_reference_profile
 from src.librettist_report import build_song_genome_summary, generate_librettist_report
-from src.providers.mock_musixmatch import MockMusixmatch
 from src.providers.mock_cyanite import MockCyanite
+from src.providers.factory import get_lyrics_provider, provider_status
 from src.contextual_palette.selection_analyzer import classify_selection
 from src.contextual_palette.runner import run_all_for_selection, get_available_modules
 from src.utils import save_json, save_text, ensure_dir, NumpyEncoder
@@ -40,7 +46,6 @@ TEMP_DIR = Path(__file__).parent / "temp"
 st.set_page_config(page_title="MGX Librettist", layout="wide")
 
 PROVIDER_MODE = os.environ.get("PROVIDER_MODE", "mock")
-HAS_API_KEYS = bool(os.environ.get("MUSIXMATCH_API_KEY") or os.environ.get("CYANITE_API_KEY"))
 
 # ─── Session state ──────────────────────────────────────────────────────────
 _DEFAULTS = {
@@ -117,8 +122,11 @@ def palette_context() -> dict:
 st.title("MGX Librettist")
 st.caption("Melody-aware AI lyrics companion for songwriters — local, copyright-safe, mock-by-default.")
 
-if PROVIDER_MODE == "mock" or not HAS_API_KEYS:
-    st.info("No API keys found: using mock providers (Musixmatch / Cyanite). The app is fully usable offline.")
+_pstatus = provider_status()
+if _pstatus["musixmatch"] == "live" or _pstatus["cyanite"] == "live":
+    st.success(f"Providers — Musixmatch: **{_pstatus['musixmatch']}** · Cyanite: **{_pstatus['cyanite']}** (mode: {_pstatus['mode']})")
+else:
+    st.info("No live API keys: using mock providers (Musixmatch / Cyanite). The app is fully usable offline.")
 
 tab_demo, tab_lyrics, tab_refs, tab_studio, tab_export = st.tabs(
     ["1 · Demo Uploader", "2 · Lyrics Prompter", "3 · References", "4 · Writing Studio", "5 · Export"]
@@ -417,26 +425,44 @@ with tab_refs:
         artists = [a.strip() for a in ref_artists.split(",") if a.strip()]
         if not artists:
             st.info("No reference artists selected: corpus insights will use generic songwriting patterns.")
-        provider = MockMusixmatch()
-        profile = build_reference_profile(
-            artists=artists,
-            provider=provider,
-            reference_songs=[s.strip() for s in ref_songs.split(",") if s.strip()],
-            avoid_artists=[a.strip() for a in avoid_artists.split(",") if a.strip()],
-            genre_tags=[t.strip() for t in genre_tags.split(",") if t.strip()],
-            lyrics_context=st.session_state.lyrics_saved,
-        )
+        provider, prov_label = get_lyrics_provider()
+        seeds = [t.strip() for t in genre_tags.split(",") if t.strip()] or ["love", "night", "city"]
+        with st.spinner(f"Querying Musixmatch ({prov_label})..."):
+            try:
+                profile = build_reference_profile(
+                    artists=artists,
+                    provider=provider,
+                    reference_songs=[s.strip() for s in ref_songs.split(",") if s.strip()],
+                    avoid_artists=[a.strip() for a in avoid_artists.split(",") if a.strip()],
+                    genre_tags=[t.strip() for t in genre_tags.split(",") if t.strip()],
+                    lyrics_context=st.session_state.lyrics_saved,
+                )
+                themes_snapshot = provider.search_by_theme(seeds)
+            except Exception as e:  # network/provider failure → graceful mock fallback
+                from src.providers.mock_musixmatch import MockMusixmatch
+                st.warning(f"Musixmatch live query failed ({e}); falling back to mock corpus.")
+                provider, prov_label = MockMusixmatch(), "mock"
+                profile = build_reference_profile(
+                    artists=artists, provider=provider,
+                    reference_songs=[s.strip() for s in ref_songs.split(",") if s.strip()],
+                    avoid_artists=[a.strip() for a in avoid_artists.split(",") if a.strip()],
+                    genre_tags=[t.strip() for t in genre_tags.split(",") if t.strip()],
+                    lyrics_context=st.session_state.lyrics_saved,
+                )
+                themes_snapshot = provider.search_by_theme(seeds)
         st.session_state.reference_profile = profile
         st.session_state.inputs["reference_artists"] = artists
         st.session_state.inputs["reference_songs"] = profile["reference_songs"]
         st.session_state.inputs["avoid_references"] = profile["avoid"]
-        # also store a musixmatch corpus snapshot for the palette
-        seeds = [t.strip() for t in genre_tags.split(",") if t.strip()] or ["love", "night", "city"]
-        st.session_state.musixmatch_result = {"themes": provider.search_by_theme(seeds)}
+        st.session_state.musixmatch_result = {"themes": themes_snapshot, "source": prov_label}
+        st.caption(f"Corpus source: **{prov_label}**")
 
     profile = st.session_state.reference_profile
     if profile and profile.get("artists") is not None:
-        st.success("Reference Profile — copyright-safe abstraction")
+        if profile.get("grounded_in_real_catalog"):
+            st.success("Reference Profile — copyright-safe abstraction, grounded in the references' real catalog (Musixmatch Analysis)")
+        else:
+            st.success("Reference Profile — copyright-safe abstraction (generic patterns)")
         ap = profile["abstract_patterns"]
         pc1, pc2 = st.columns(2)
         with pc1:
@@ -446,8 +472,25 @@ with tab_refs:
             st.markdown(f"**Chorus style:** {ap['chorus_style']}")
         with pc2:
             st.markdown("**Common themes:** " + ", ".join(ap["common_themes"]))
+            if ap.get("dominant_moods"):
+                st.markdown("**Dominant moods (real):** " + ", ".join(ap["dominant_moods"]))
             st.markdown("**Lexical fields:** " + ", ".join(ap["lexical_fields"][:10]))
             st.markdown("**Symbolic register:** " + ", ".join(ap["symbolic_register"]))
+
+        if profile.get("reference_artist_profiles"):
+            st.markdown("**Per-artist abstract patterns (from real top tracks)**")
+            for prof in profile["reference_artist_profiles"]:
+                with st.expander(f"{prof['artist']} — {prof.get('n_tracks_analyzed', 0)} tracks analyzed"):
+                    if prof.get("themes"):
+                        st.markdown("Themes: " + ", ".join(prof["themes"][:8]))
+                    if prof.get("moods"):
+                        st.markdown("Moods: " + ", ".join(prof["moods"]))
+                    if prof.get("genres"):
+                        st.markdown("Genres: " + ", ".join(prof["genres"]))
+                    if prof.get("entities"):
+                        st.markdown("Entities: " + ", ".join(prof["entities"][:8]))
+                    st.caption("Abstract descriptors only — no lyrics.")
+
         st.markdown("**Creative constraints**")
         for c in profile["creative_constraints"]:
             st.write(f"- {c}")
