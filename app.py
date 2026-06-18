@@ -267,9 +267,9 @@ tab_demo, tab_lyrics, tab_refs, tab_studio, tab_export = st.tabs([
 # ═════════════════════════════════════════════════════════════════════════════
 with tab_demo:
     st.header("Demo Uploader")
-    st.caption("Upload your demo audio (required). Optionally add vocal/backing MIDI and manual metadata.")
+    st.caption("Upload your demo audio as **MP3** (required). Optionally add vocal/backing MIDI and manual metadata.")
 
-    uploaded_file = st.file_uploader("Demo audio — WAV / MP3 / FLAC", type=["wav", "mp3", "flac"], key="audio_upload")
+    uploaded_file = st.file_uploader("Demo audio — MP3", type=["mp3"], key="audio_upload")
 
     col_vm, col_bm = st.columns(2)
     with col_vm:
