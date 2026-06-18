@@ -14,6 +14,17 @@ except Exception:
     pass
 
 import streamlit as st
+
+# On Streamlit Community Cloud secrets live in st.secrets (not the environment).
+# Mirror them into os.environ so the existing os.environ.get(...) lookups for
+# OPENAI/CYANITE/MUSIXMATCH/PROVIDER keys keep working in the cloud.
+try:
+    for _sk, _sv in st.secrets.items():
+        if isinstance(_sv, str):
+            os.environ.setdefault(_sk, _sv)
+except Exception:
+    pass
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
