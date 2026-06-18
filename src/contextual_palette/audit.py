@@ -11,6 +11,7 @@ import re
 from typing import Any
 
 from .selection_analyzer import classify_selection
+from .rephrase_selection import compute_line_targets
 from .modules import (
     metric_fit,
     stress_alignment,
@@ -142,6 +143,13 @@ def build_selection_audit(selected_text: str, context: dict[str, Any]) -> dict[s
     imagery_score, imagery_notes = _imagery_strength(selected_text, context)
     ref_score, ref_info = _reference_alignment(selected_text, context)
 
+    # Per-line syllable targets, mapped to the corresponding vocal-MIDI phrases.
+    _rng = mf.get("suggested_target_syllable_range")
+    _nlines = len([l for l in selected_text.splitlines() if l.strip()]) or 1
+    _fb = (max(2, round(((_rng[0] + _rng[1]) / 2) / _nlines))
+           if (_rng and len(_rng) == 2) else None)
+    per_line_targets = compute_line_targets(selected_text, context, fallback_per_line=_fb)
+
     scores = {
         "metric_fit": metric_fit_score,
         "stress_alignment": stress_score,
@@ -230,6 +238,7 @@ def build_selection_audit(selected_text: str, context: dict[str, Any]) -> dict[s
             "estimated_syllables": mf.get("estimated_syllables"),
             "target_syllable_range": mf.get("suggested_target_syllable_range"),
             "available_melodic_slots": mf.get("available_melodic_slots"),
+            "per_line_targets": per_line_targets,
             "problems": mf.get("problems", []),
             "rewrite_targets": mf.get("rewrite_targets", {}),
         },

@@ -75,6 +75,8 @@ _DEFAULTS = {
     "generated_draft": None, "composition_brief": None,
     "palette_results": None, "lyrics_saved": "", "theme_prompt": "",
     "selected_text": "", "selection_type": "", "selection_line_range": None,
+    "selection_line_idxs": [],
+    "lyrics_version": 0,
     "selection_audit": None, "rephrase_candidate": None, "apply_confirm": "",
     "inputs": {"audio_file": "", "vocal_midi_file": "", "backing_midi_file": "",
                "reference_artists": [], "reference_songs": [], "avoid_references": []},
@@ -152,6 +154,7 @@ def build_full_project() -> dict:
             "selected_text": st.session_state.selected_text or "",
             "selection_type": st.session_state.selection_type or "",
             "selection_line_range": st.session_state.selection_line_range,
+            "selection_line_idxs": st.session_state.selection_line_idxs or [],
             "selection_audit": st.session_state.selection_audit or {},
             "copyright_safe": True,
             "stored_content_policy": "abstract_descriptors_only_no_lyrics",
@@ -251,7 +254,7 @@ _lyrics_done = bool(st.session_state.mining_result) or bool(
     st.session_state.writing_brief and st.session_state.writing_brief.get("core_theme")
 )
 _refs_done = bool(st.session_state.reference_profile and st.session_state.reference_profile.get("artists"))
-_studio_done = bool((st.session_state.lyrics_saved or "").strip()) or bool(st.session_state.generated_draft)
+_studio_done = bool(st.session_state.selection_audit) or bool(st.session_state.generated_draft)
 
 tab_demo, tab_lyrics, tab_refs, tab_studio, tab_export = st.tabs([
     _tab_label("1 · Demo Uploader", _demo_done),
@@ -511,6 +514,8 @@ with tab_lyrics:
         )
         if lyrics_text != st.session_state.lyrics_saved:
             st.session_state.lyrics_saved = lyrics_text
+            # Bump the version so the Writing Studio editor re-syncs to this new text.
+            st.session_state.lyrics_version += 1
 
         if lyrics_text and lyrics_text.strip():
             lr = analyze_lyrics(lyrics_text)
@@ -593,6 +598,23 @@ with tab_lyrics:
                     provider=get_llm_provider(),
                     reference_profile=st.session_state.reference_profile,
                 )
+            # New concept = new direction: clear stale Mode-A lyrics/draft so the
+            # Writing Studio restarts fresh from this brief (drafted on the melody).
+            if (st.session_state.lyrics_saved or "").strip() or st.session_state.generated_draft:
+                st.session_state.lyrics_saved = ""
+                st.session_state.lyrics_result = None
+                st.session_state.prosody_result = None
+                st.session_state.mining_result = None
+                st.session_state.generated_draft = None
+                st.session_state.composition_brief = None
+                st.session_state.selected_text = ""
+                st.session_state.selection_audit = None
+                st.session_state.selection_line_idxs = []
+                st.session_state.selection_line_range = None
+                st.session_state.rephrase_candidate = None
+                st.session_state.lyrics_version += 1
+                st.info("New direction from your concept — previous lyrics cleared. "
+                        "Open **Writing Studio → Metric Draft Scaffold** to draft on the melody.")
 
         wb = st.session_state.writing_brief
         if wb and wb.get("core_theme"):
@@ -800,11 +822,12 @@ with tab_studio:
     _melody_aware = bool(st.session_state.vocal_midi and st.session_state.vocal_midi.get("n_notes"))
     with st.expander("💡 How the Writing Studio works", expanded=not st.session_state.selected_text):
         st.markdown(
-            "1. **Click a line or a block** in the lyrics editor on the left.\n"
-            "2. The right panel **audits it automatically** — why it works or doesn't.\n"
-            "3. Set **mood**, **rhyme structure** and an optional **reference artist**.\n"
-            "4. Click **Rephrase** for a melody-aware alternative (OpenAI runs only on click).\n"
-            "5. Click **Apply** to replace just that line/block in your draft."
+            "1. **Toggle one or more verse boxes** on the left — even non-adjacent ones "
+            "(e.g. lines 1, 2 and 4). Unselected lines stay untouched.\n"
+            "2. The right panel **audits your selection automatically** — per line, melody-aware.\n"
+            "3. Set **mood**, **rhyme structure**, **melody-metric strength** and an optional **reference artist**.\n"
+            "4. Click **Rephrase** for melody-aware alternatives (OpenAI runs only on click).\n"
+            "5. Click **Apply** to replace only the selected lines in your draft."
         )
         if _melody_aware:
             st.caption(":green[Vocal MIDI detected — Metric Fit & Stress Alignment run in melody-aware mode.]")
@@ -843,45 +866,75 @@ with tab_studio:
     if not lyrics_text.strip():
         st.info("No lyrics yet — use **🎼 Metric Draft Scaffold** below to draft on the melody, "
                 "or paste your own in **Lyrics Prompter → Mode A**. "
-                "Then click any line or block here to audit and rephrase it.")
+                "Then toggle verse boxes here to audit and rephrase them.")
     else:
         col_editor, col_palette = st.columns([3, 2])
 
         with col_editor:
             st.markdown("#### Lyrics editor")
-            edited = st.text_area("Edit freely — then click a line/block below to audit it",
-                                  value=lyrics_text, height=240, key="studio_lyrics")
+            st.caption("To change the source text or restart the flow, go back to "
+                       "**Lyrics Prompter** — your new text syncs here automatically.")
+            # Versioned key: when the Lyrics Prompter changes the text, the widget
+            # re-initialises from the new value instead of keeping the old draft.
+            edited = st.text_area(
+                "Edit freely — then toggle a verse box below to audit it",
+                value=lyrics_text, height=240,
+                key=f"studio_lyrics_{st.session_state.lyrics_version}")
             if edited != st.session_state.lyrics_saved:
                 st.session_state.lyrics_saved = edited
                 lyrics_text = edited
+                _lang = st.session_state.project_meta.get("language", "auto")
+                if st.session_state.prosody_result is not None:
+                    st.session_state.prosody_result = analyze_lines_prosody(edited, _lang)
+                    st.session_state.lyrics_result = analyze_lyrics(edited)
+                if st.session_state.mining_result is not None:
+                    st.session_state.mining_result = mine_text(edited)
+                # Selection indices may have shifted — reset to avoid editing the wrong line.
+                st.session_state.selection_line_idxs = []
+                st.session_state.selected_text = ""
+                st.session_state.selection_line_range = None
+                st.session_state.selection_audit = None
+                st.session_state.rephrase_candidate = None
+                st.rerun()
 
             _raw_lines, _seg_lines, _stanzas = _segment_lyrics(lyrics_text)
-            st.caption("Click **Select block** for a stanza/chorus, or a single line to audit just that line.")
+
+            _sel_set = set(st.session_state.selection_line_idxs or [])
+
+            def _commit_selection(idxs: set[int]):
+                """Persist a non-contiguous line selection and refresh derived state."""
+                ordered = sorted(i for i in idxs if 0 <= i < len(_raw_lines))
+                st.session_state.selection_line_idxs = ordered
+                st.session_state.selected_text = "\n".join(_raw_lines[i] for i in ordered)
+                st.session_state.selection_line_range = (
+                    [ordered[0], ordered[-1]] if ordered else None)
+                st.session_state.selection_type = (
+                    "" if not ordered else ("LINE" if len(ordered) == 1 else "BLOCK"))
+                st.session_state.rephrase_candidate = None
+
+            _tc1, _tc2 = st.columns([3, 1])
+            _tc1.caption("Click verse boxes to **toggle** them. Pick several (even non-adjacent) "
+                         "to audit & rephrase them together — unselected lines stay untouched.")
+            if _tc2.button("Clear", key="clear_sel", disabled=not _sel_set):
+                _commit_selection(set())
+                st.rerun()
+
             for _si, _stz in enumerate(_stanzas):
                 with st.container(border=True):
-                    _hc1, _hc2 = st.columns([3, 1])
-                    _block_selected = st.session_state.selection_line_range == [_stz["start"], _stz["end"]]
-                    _hc1.caption(("✅ " if _block_selected else "") +
-                                 f"**{_stz['kind']}** · lines {_stz['start']+1}–{_stz['end']+1}")
-                    if _hc2.button("Select block", key=f"selstz_{_si}"):
-                        st.session_state.selected_text = _stz["text"]
-                        st.session_state.selection_type = _stz["kind"]
-                        st.session_state.selection_line_range = [_stz["start"], _stz["end"]]
-                        st.session_state.rephrase_candidate = None
-                        st.rerun()
+                    st.caption(f"**{_stz['kind']}** · lines {_stz['start']+1}–{_stz['end']+1}")
                     for _li in _stz["line_idxs"]:
                         _ltext = _raw_lines[_li]
                         if re.match(r"^[\[#]", _ltext.strip()):
                             st.caption(_ltext)
                             continue
                         _lbl = _ltext.strip()[:50] or "(blank)"
-                        _is_sel = st.session_state.selection_line_range == [_li, _li]
-                        if st.button(("● " if _is_sel else "○ ") + _lbl, key=f"selln_{_li}",
+                        _is_sel = _li in _sel_set
+                        if st.button(("☑ " if _is_sel else "☐ ") + _lbl, key=f"selln_{_li}",
                                      use_container_width=True):
-                            st.session_state.selected_text = _ltext
-                            st.session_state.selection_type = "CHORUS" if _stz["kind"] == "CHORUS" else "LINE"
-                            st.session_state.selection_line_range = [_li, _li]
-                            st.session_state.rephrase_candidate = None
+                            if _is_sel:
+                                _commit_selection(_sel_set - {_li})
+                            else:
+                                _commit_selection(_sel_set | {_li})
                             st.rerun()
 
             _pr = st.session_state.prosody_result
@@ -897,16 +950,20 @@ with tab_studio:
                 st.session_state.apply_confirm = ""
             _sel = (st.session_state.selected_text or "").strip()
             if not _sel:
-                st.info("Select a line or block in the lyrics editor to audit it.")
+                st.info("Toggle one or more verse boxes on the left to audit them together.")
                 st.session_state.selection_audit = None
             else:
                 _ctx = palette_context()
                 _ctx["full_lyrics"] = lyrics_text
                 _ctx["selection_type"] = st.session_state.selection_type
+                _ctx["selection_line_range"] = st.session_state.selection_line_range
+                _ctx["selection_line_idxs"] = st.session_state.selection_line_idxs
                 _audit = build_selection_audit(st.session_state.selected_text, _ctx)
                 st.session_state.selection_audit = _audit
 
-                st.caption(f'Selected · **{_audit.get("selection_type", "?")}** · "{_sel[:70]}"')
+                _nsel = len(st.session_state.selection_line_idxs or [])
+                st.caption(f'Selected · **{_audit.get("selection_type", "?")}** · '
+                           f'{_nsel} line(s) · "{_sel[:60]}"')
                 st.markdown(f"**Why this works / doesn't:** {_audit.get('summary_blurb', '')}")
 
                 _scores = _audit.get("scores", {})
@@ -929,7 +986,18 @@ with tab_studio:
                                 text=f"Reference Alignment: {int(_rscore)}/100")
 
                 _m = _audit.get("metric", {})
-                if _m.get("target_syllable_range"):
+                _plt = _m.get("per_line_targets") or []
+                if _plt and any(p.get("target") is not None for p in _plt):
+                    st.caption(f":blue[Melody metric ({_m.get('mode', 'heuristic')}) — "
+                               "per-line syllable targets from the vocal MIDI phrases:]")
+                    for _i, _p in enumerate(_plt, 1):
+                        _t = _p.get("target")
+                        if _t is None:
+                            continue
+                        _d = _p["current"] - _t
+                        _hint = "ok" if abs(_d) <= 1 else (f"cut ~{_d}" if _d > 0 else f"add ~{-_d}")
+                        st.caption(f"  Line {_i}: now {_p['current']} syl → target **{_t}** ({_hint})")
+                elif _m.get("target_syllable_range"):
                     _tr = _m["target_syllable_range"]
                     st.caption(f":blue[Metric ({_m.get('mode', 'heuristic')}): "
                                f"~{_m.get('estimated_syllables')} syllables · target {_tr[0]}–{_tr[1]}]")
@@ -971,6 +1039,11 @@ with tab_studio:
                     options=["tight couplets (AABB)", "alternating (ABAB)",
                              "enclosed / looser (ABBA)", "loose / slant rhyme"],
                     value="alternating (ABAB)", key="reph_rhyme")
+                _metric_strength = st.select_slider(
+                    "Stick to melody metric",
+                    options=["loose (keep my words)", "balanced", "tight (rewrite to fit melody)"],
+                    value="balanced", key="reph_metric_strength",
+                    help="How aggressively to reword each line to hit the per-line syllable target.")
                 _ref_artists = list((rp or {}).get("artists", []) or [])
                 _active_artist = st.selectbox("Reference direction",
                                               ["No specific artist"] + _ref_artists, key="reph_artist")
@@ -983,6 +1056,7 @@ with tab_studio:
                             mood_target=_mood, rhyme_structure=_rhyme,
                             active_reference_artist=(None if _active_artist == "No specific artist"
                                                      else _active_artist),
+                            metric_strength=_metric_strength,
                             provider=get_llm_provider(),
                         )
 
@@ -1006,32 +1080,54 @@ with tab_studio:
                             if _exp.get(_ek):
                                 st.caption(f"**{_ek.title()}:** {_exp[_ek]}")
                     _mrep = _cand.get("metric_report", {})
-                    if _mrep.get("target_syllable_range"):
+                    if _mrep.get("all_in_range") is not None:
                         _ok = _mrep.get("all_in_range")
                         (st.success if _ok else st.warning)(
-                            f"Metric target {_mrep['target_syllable_range'][0]}–{_mrep['target_syllable_range'][1]} syl/line"
-                            + (" · all lines fit" if _ok else " · some lines off — try Rephrase again"))
+                            "Metric fit: all lines on target (±1)" if _ok
+                            else "Some lines still off target — try **tight** or Rephrase again")
+                        with st.expander("Per-line metric check"):
+                            for _r in _mrep.get("per_line", []):
+                                _t = _r.get("target")
+                                _mark = "✅" if _r.get("fit") else ("⚠️" if _t is not None else "·")
+                                st.text(f'{_mark} {_r["syllables"]:>2} syl'
+                                        + (f" / target {_t:>2}" if _t is not None else "")
+                                        + '  | ' + _r["text"])
                     st.caption(":green[Original text only — no copyrighted lyrics or imitation.]")
 
                 if _apply_clicked and _cand and _cand.get("candidate"):
-                    _rng = st.session_state.selection_line_range
-                    _newsel = _cand["candidate"]
+                    _idxs = list(st.session_state.selection_line_idxs or [])
+                    _newlines = _cand["candidate"].splitlines() or [_cand["candidate"]]
                     _raw = st.session_state.lyrics_saved.splitlines()
                     _done = False
-                    if _rng and 0 <= _rng[0] <= _rng[1] < len(_raw):
-                        _raw[_rng[0]:_rng[1] + 1] = (_newsel.splitlines() or [_newsel])
+                    if _idxs and len(_newlines) == len(_idxs) and all(0 <= i < len(_raw) for i in _idxs):
+                        # Replace each selected line in place; untouched lines stay as-is.
+                        for _k, _li in enumerate(_idxs):
+                            _raw[_li] = _newlines[_k]
                         st.session_state.lyrics_saved = "\n".join(_raw)
                         _done = True
-                    elif st.session_state.lyrics_saved.count(st.session_state.selected_text) == 1:
-                        st.session_state.lyrics_saved = st.session_state.lyrics_saved.replace(
-                            st.session_state.selected_text, _newsel, 1)
+                    elif _idxs and all(0 <= i < len(_raw) for i in _idxs):
+                        # Line-count mismatch: rebuild the first selected line, drop the rest,
+                        # then splice so we never lose or duplicate content.
+                        _new_block = _cand["candidate"]
+                        _first = _idxs[0]
+                        _rest = set(_idxs[1:])
+                        _rebuilt = []
+                        for _i, _ln in enumerate(_raw):
+                            if _i == _first:
+                                _rebuilt.extend(_new_block.splitlines() or [_new_block])
+                            elif _i in _rest:
+                                continue
+                            else:
+                                _rebuilt.append(_ln)
+                        st.session_state.lyrics_saved = "\n".join(_rebuilt)
                         _done = True
                     if _done:
-                        st.session_state.pop("studio_lyrics", None)
+                        st.session_state.lyrics_version += 1
                         st.session_state.rephrase_candidate = None
                         st.session_state.selected_text = ""
                         st.session_state.selection_audit = None
                         st.session_state.selection_line_range = None
+                        st.session_state.selection_line_idxs = []
                         _nt = st.session_state.lyrics_saved
                         if st.session_state.prosody_result is not None:
                             st.session_state.prosody_result = analyze_lines_prosody(
@@ -1155,10 +1251,11 @@ with tab_studio:
             uc1, uc2 = st.columns(2)
             if uc1.button("⬇ Use this draft in the editor", key="use_draft"):
                 st.session_state.lyrics_saved = draft_to_text(draft)
-                st.session_state.pop("studio_lyrics", None)
+                st.session_state.lyrics_version += 1
                 st.session_state.selected_text = ""
                 st.session_state.selection_audit = None
                 st.session_state.selection_line_range = None
+                st.session_state.selection_line_idxs = []
                 st.session_state.rephrase_candidate = None
                 st.rerun()
             if uc2.button("🔄 Regenerate all", key="regen_draft"):

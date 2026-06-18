@@ -2,37 +2,5174 @@
   "project_meta": {
     "title": "",
     "language": "auto",
-    "created_at": "",
+    "created_at": "2026-06-18T18:30:56",
     "provider_mode": "real"
   },
   "inputs": {
-    "audio_file": "",
-    "vocal_midi_file": "",
+    "audio_file": "/Users/matteotambussi/Documents/GitHub/mgx/mgx_encoder/temp/TestSong_demo.mp3",
+    "vocal_midi_file": "/Users/matteotambussi/Documents/GitHub/mgx/mgx_encoder/temp/vocal_TestSong_topline.mid",
     "backing_midi_file": "",
-    "reference_artists": [],
+    "reference_artists": [
+      "depeche mode"
+    ],
     "reference_songs": [],
-    "avoid_references": []
+    "avoid_references": [
+      "Avoid reproducing any recognizable melodic or lyrical phrase from references."
+    ]
   },
   "analysis": {
-    "mgx": {},
-    "cyanite": {},
-    "cyanite_source": null,
-    "song_genome_summary": {},
-    "vocal_midi": {},
+    "mgx": {
+      "meta": {
+        "source": "file",
+        "filename": "TestSong_demo.mp3",
+        "title": "",
+        "language": "auto",
+        "declared_bpm": "",
+        "declared_key": "",
+        "duration_sec": 133.67,
+        "sample_rate": 44100,
+        "analysis_sample_rate": 22050,
+        "notes": []
+      },
+      "R": {
+        "bpm": 117.45383522727273,
+        "bpm_confidence": 1.0,
+        "time_signature": "4/4",
+        "beat_regularity": 0.9768243228176063,
+        "groove_complexity": 0.07949475753914309,
+        "swing_ratio": 0.5116279068577609,
+        "onset_density": 2.444435542530292,
+        "polyrhythm_flag": false
+      },
+      "M": {
+        "pitch_range_hz": 898.6219879150391,
+        "pitch_mean_hz": 528.4388153362619,
+        "pitch_std_hz": 216.6455324304839,
+        "mean_interval_semitones": 0.8609135222964435,
+        "contour_direction": -0.03747968947463441,
+        "stepwise_ratio": 0.9071312511283626,
+        "voiced_ratio": 1.0,
+        "vocal_likelihood": 0.7072731852531433,
+        "pitch_confidence": 0.7019108710588255,
+        "pitch_class_histogram": [
+          0.06101082971480146,
+          0.07752707503700362,
+          0.07933212917057764,
+          0.08826714713176897,
+          0.10424187621389894,
+          0.0972021650929603,
+          0.0947653420126354,
+          0.10938628049458486,
+          0.07680505338357402,
+          0.07599277902346571,
+          0.07879061293050543,
+          0.05667869979422384
+        ],
+        "contour_symbols": [
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "D",
+          "D",
+          "R",
+          "D",
+          "D",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "D",
+          "D",
+          "R",
+          "D",
+          "R",
+          "D",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "R",
+          "R",
+          "R",
+          "U",
+          "R",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "D",
+          "D",
+          "R",
+          "R",
+          "R",
+          "D",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "U",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "D",
+          "R",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "U",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "D",
+          "D",
+          "R",
+          "D",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "R",
+          "U",
+          "U",
+          "R",
+          "R",
+          "R"
+        ],
+        "interval_histogram": [
+          0.007221520129987363,
+          0.0009929590178732624,
+          0.0015345730276223146,
+          0.0017151110308719986,
+          0.0017151110308719986,
+          0.0022567250406210506,
+          0.003159415056869471,
+          0.004964795089366311,
+          0.00803394114461094,
+          0.012366853222603358,
+          0.023740747427333453,
+          0.07411085033399531,
+          0.7516699765300596,
+          0.04378046578804838,
+          0.016158151290846724,
+          0.01020039718360715,
+          0.00758259613648673,
+          0.005867485105614732,
+          0.004874526087741469,
+          0.0020761870373713666,
+          0.0020761870373713666,
+          0.0018956490341216826,
+          0.002166456038996209,
+          0.0015345730276223146,
+          0.008304748149485466
+        ],
+        "contour_bigrams": {
+          "UU": 0.0472,
+          "UD": 0.0001,
+          "UR": 0.0593,
+          "DU": 0.0,
+          "DD": 0.0611,
+          "DR": 0.0808,
+          "RU": 0.0593,
+          "RD": 0.0807,
+          "RR": 0.6116
+        },
+        "pc_transition_matrix": [
+          [
+            0.7308,
+            0.0451,
+            0.0201,
+            0.0187,
+            0.0133,
+            0.0097,
+            0.0122,
+            0.0167,
+            0.0155,
+            0.011,
+            0.0316,
+            0.0751
+          ],
+          [
+            0.0629,
+            0.7668,
+            0.0425,
+            0.0312,
+            0.0188,
+            0.0066,
+            0.0156,
+            0.0057,
+            0.009,
+            0.0163,
+            0.0065,
+            0.0179
+          ],
+          [
+            0.027,
+            0.0601,
+            0.7356,
+            0.0581,
+            0.0229,
+            0.0169,
+            0.0169,
+            0.0207,
+            0.0086,
+            0.0054,
+            0.0105,
+            0.017
+          ],
+          [
+            0.0188,
+            0.0339,
+            0.0657,
+            0.7267,
+            0.0567,
+            0.0242,
+            0.0198,
+            0.0065,
+            0.0143,
+            0.009,
+            0.0144,
+            0.0101
+          ],
+          [
+            0.0091,
+            0.0091,
+            0.0179,
+            0.0703,
+            0.7798,
+            0.05,
+            0.0179,
+            0.0139,
+            0.0088,
+            0.0078,
+            0.0093,
+            0.0058
+          ],
+          [
+            0.0069,
+            0.009,
+            0.0167,
+            0.0298,
+            0.0742,
+            0.774,
+            0.0452,
+            0.0119,
+            0.0069,
+            0.009,
+            0.0063,
+            0.0103
+          ],
+          [
+            0.0097,
+            0.0103,
+            0.0141,
+            0.0212,
+            0.0249,
+            0.0785,
+            0.7395,
+            0.0592,
+            0.0142,
+            0.0126,
+            0.0113,
+            0.0041
+          ],
+          [
+            0.0084,
+            0.0093,
+            0.0095,
+            0.0144,
+            0.0134,
+            0.0207,
+            0.0729,
+            0.7785,
+            0.0368,
+            0.0147,
+            0.0117,
+            0.0099
+          ],
+          [
+            0.007,
+            0.0105,
+            0.0084,
+            0.0035,
+            0.013,
+            0.0163,
+            0.0372,
+            0.0889,
+            0.7398,
+            0.0492,
+            0.0141,
+            0.0119
+          ],
+          [
+            0.0071,
+            0.0071,
+            0.0142,
+            0.0154,
+            0.0096,
+            0.0059,
+            0.0166,
+            0.038,
+            0.0835,
+            0.7479,
+            0.043,
+            0.0119
+          ],
+          [
+            0.0186,
+            0.0138,
+            0.0176,
+            0.009,
+            0.0086,
+            0.0043,
+            0.0057,
+            0.0129,
+            0.0277,
+            0.0825,
+            0.7652,
+            0.0343
+          ],
+          [
+            0.037,
+            0.0238,
+            0.0165,
+            0.0186,
+            0.016,
+            0.0051,
+            0.0142,
+            0.0189,
+            0.0207,
+            0.0186,
+            0.0896,
+            0.7207
+          ]
+        ],
+        "pitch_class_profile_relative": [
+          0.07599277978339349,
+          0.07879061371841155,
+          0.056678700361010824,
+          0.06101083032490974,
+          0.07752707581227436,
+          0.07933212996389892,
+          0.08826714801444042,
+          0.10424187725631769,
+          0.09720216606498193,
+          0.0947653429602888,
+          0.10938628158844764,
+          0.07680505415162454
+        ]
+      },
+      "H": {
+        "key": "A",
+        "mode": "minor",
+        "key_center": "A",
+        "key_mode": "minor",
+        "key_confidence": 1.0,
+        "key_candidates": [
+          {
+            "key": "A",
+            "mode": "minor",
+            "score": 0.8349
+          },
+          {
+            "key": "C",
+            "mode": "major",
+            "score": 0.6017
+          },
+          {
+            "key": "F",
+            "mode": "major",
+            "score": 0.6014
+          }
+        ],
+        "mode_ambiguity": "low",
+        "mode_confidence": 1.0,
+        "tuning_offset_cents": 4.0000000000000036,
+        "chroma_profile": [
+          0.5997549891471863,
+          0.2563387453556061,
+          0.5546181797981262,
+          0.20375972986221313,
+          0.5232774019241333,
+          0.3950769901275635,
+          0.43760570883750916,
+          0.6373971700668335,
+          0.354871541261673,
+          1.0,
+          0.26997140049934387,
+          0.2830337882041931
+        ],
+        "harmonic_change_rate": 0.03044748306274414,
+        "chroma_entropy": 3.001467704772949,
+        "tonnetz_centroid": [
+          0.258862487859517,
+          0.11708289143793132,
+          -0.10474049151763289,
+          0.0405532135356668,
+          0.0034144468003233326,
+          0.05718580922254762
+        ],
+        "chord_tier": 1,
+        "chord_sequence": [
+          "Amin",
+          "Am7",
+          "Amin",
+          "Am7",
+          "Amin",
+          "Am7",
+          "D",
+          "D7",
+          "D",
+          "D7",
+          "Am7",
+          "Amin",
+          "Am7",
+          "Amin",
+          "Am7",
+          "F#dim",
+          "D",
+          "D7",
+          "D",
+          "Am7",
+          "D7",
+          "Am7",
+          "Amin",
+          "Am7",
+          "Amin",
+          "Am7",
+          "D",
+          "D7",
+          "D",
+          "D7",
+          "F#m7",
+          "Am7",
+          "Amin",
+          "Am7",
+          "Amin",
+          "A",
+          "Am7",
+          "D",
+          "D7",
+          "D",
+          "D7",
+          "Am7",
+          "A5",
+          "Amin",
+          "A5",
+          "Em7",
+          "G5",
+          "G",
+          "G5",
+          "Dm7",
+          "D5",
+          "Dm7",
+          "D7",
+          "A5",
+          "Amin",
+          "Am7",
+          "Emin",
+          "G",
+          "D7",
+          "D5",
+          "Dmin",
+          "D5",
+          "Dmin",
+          "D5"
+        ],
+        "root_sequence": [
+          "A",
+          "D",
+          "A",
+          "F#",
+          "D",
+          "A",
+          "D",
+          "A",
+          "D",
+          "F#",
+          "A",
+          "D",
+          "A",
+          "E",
+          "G",
+          "D",
+          "A",
+          "E",
+          "G",
+          "D",
+          "A",
+          "E",
+          "G",
+          "E",
+          "D",
+          "A",
+          "D",
+          "A",
+          "G",
+          "B",
+          "F",
+          "A",
+          "D",
+          "A",
+          "D",
+          "A",
+          "D",
+          "A",
+          "D",
+          "F#",
+          "D",
+          "A",
+          "D",
+          "A",
+          "D",
+          "F#",
+          "A",
+          "D",
+          "F#",
+          "A",
+          "G",
+          "E",
+          "D",
+          "A",
+          "D",
+          "G",
+          "B",
+          "D",
+          "A",
+          "G",
+          "E",
+          "G",
+          "D",
+          "A"
+        ],
+        "harmonic_emphasis": [
+          0.5997549891471863,
+          0.2563387453556061,
+          0.5546181797981262,
+          0.20375972986221313,
+          0.5232774019241333,
+          0.3950769901275635,
+          0.43760570883750916,
+          0.6373971700668335,
+          0.354871541261673,
+          1.0,
+          0.26997140049934387,
+          0.2830337882041931
+        ],
+        "chord_confidence": 0.7991,
+        "section_weighted_key": {
+          "key": "A",
+          "mode": "minor",
+          "score": 0.8221940086097207,
+          "method": "section_weighted"
+        },
+        "chroma_profile_relative": [
+          0.18130046531602062,
+          0.048945940532548804,
+          0.05131415750157624,
+          0.10873585860798977,
+          0.0464743338114963,
+          0.10055253407012467,
+          0.036941733836685905,
+          0.09487043645820371,
+          0.07162764214578014,
+          0.07933811863718745,
+          0.11556040352423165,
+          0.06433837555815472
+        ],
+        "harmonic_emphasis_relative": [
+          0.18130046531602062,
+          0.048945940532548804,
+          0.05131415750157624,
+          0.10873585860798977,
+          0.0464743338114963,
+          0.10055253407012467,
+          0.036941733836685905,
+          0.09487043645820371,
+          0.07162764214578014,
+          0.07933811863718745,
+          0.11556040352423165,
+          0.06433837555815472
+        ],
+        "relative_root_functions": [
+          "I",
+          "IV",
+          "I",
+          "VI",
+          "IV",
+          "I",
+          "IV",
+          "I",
+          "IV",
+          "VI",
+          "I",
+          "IV",
+          "I",
+          "V",
+          "bVII",
+          "IV",
+          "I",
+          "V",
+          "bVII",
+          "IV",
+          "I",
+          "V",
+          "bVII",
+          "V",
+          "IV",
+          "I",
+          "IV",
+          "I",
+          "bVII",
+          "II",
+          "bVI",
+          "I",
+          "IV",
+          "I",
+          "IV",
+          "I",
+          "IV",
+          "I",
+          "IV",
+          "VI",
+          "IV",
+          "I",
+          "IV",
+          "I",
+          "IV",
+          "VI",
+          "I",
+          "IV",
+          "VI",
+          "I",
+          "bVII",
+          "V",
+          "IV",
+          "I",
+          "IV",
+          "bVII",
+          "II",
+          "IV",
+          "I",
+          "bVII",
+          "V",
+          "bVII",
+          "IV",
+          "I"
+        ],
+        "relative_chord_functions": [
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "VIdim",
+          "IV",
+          "IV7",
+          "IV",
+          "Im7",
+          "IV7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "VIm7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "I",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "Im7",
+          "I5",
+          "Imin",
+          "I5",
+          "Vm7",
+          "bVII5",
+          "bVII",
+          "bVII5",
+          "IVm7",
+          "IV5",
+          "IVm7",
+          "IV7",
+          "I5",
+          "Imin",
+          "Im7",
+          "Vmin",
+          "bVII",
+          "IV7",
+          "IV5",
+          "IVmin",
+          "IV5",
+          "IVmin",
+          "IV5"
+        ],
+        "harmonic_rhythm_per_beat": 0.25022567249412353,
+        "notes": []
+      },
+      "X": {
+        "repetition_density": 0.9842519685027069,
+        "mean_self_similarity": 0.9945690631866455,
+        "n_motif_pairs": 7875,
+        "estimated_unique_motifs": 1,
+        "motif_confidence": 1.0,
+        "notes": []
+      },
+      "F": {
+        "sections": [
+          {
+            "label": "S6",
+            "start_sec": 0.0,
+            "end_sec": 3.99
+          },
+          {
+            "label": "S2",
+            "start_sec": 3.99,
+            "end_sec": 7.99
+          },
+          {
+            "label": "S6",
+            "start_sec": 7.99,
+            "end_sec": 11.98
+          },
+          {
+            "label": "S2",
+            "start_sec": 11.98,
+            "end_sec": 15.98
+          },
+          {
+            "label": "S6",
+            "start_sec": 15.98,
+            "end_sec": 19.97
+          },
+          {
+            "label": "S2",
+            "start_sec": 19.97,
+            "end_sec": 23.96
+          },
+          {
+            "label": "S6",
+            "start_sec": 23.96,
+            "end_sec": 27.96
+          },
+          {
+            "label": "S2",
+            "start_sec": 27.96,
+            "end_sec": 31.95
+          },
+          {
+            "label": "S0",
+            "start_sec": 31.95,
+            "end_sec": 35.94
+          },
+          {
+            "label": "S1",
+            "start_sec": 35.94,
+            "end_sec": 39.94
+          },
+          {
+            "label": "S0",
+            "start_sec": 39.94,
+            "end_sec": 43.93
+          },
+          {
+            "label": "S1",
+            "start_sec": 43.93,
+            "end_sec": 47.93
+          },
+          {
+            "label": "S0",
+            "start_sec": 47.93,
+            "end_sec": 51.92
+          },
+          {
+            "label": "S1",
+            "start_sec": 51.92,
+            "end_sec": 55.91
+          },
+          {
+            "label": "S0",
+            "start_sec": 55.91,
+            "end_sec": 59.91
+          },
+          {
+            "label": "S5",
+            "start_sec": 59.91,
+            "end_sec": 63.9
+          },
+          {
+            "label": "S7",
+            "start_sec": 63.9,
+            "end_sec": 67.9
+          },
+          {
+            "label": "S2",
+            "start_sec": 67.9,
+            "end_sec": 71.89
+          },
+          {
+            "label": "S6",
+            "start_sec": 71.89,
+            "end_sec": 75.88
+          },
+          {
+            "label": "S2",
+            "start_sec": 75.88,
+            "end_sec": 79.88
+          },
+          {
+            "label": "S6",
+            "start_sec": 79.88,
+            "end_sec": 83.87
+          },
+          {
+            "label": "S4",
+            "start_sec": 83.87,
+            "end_sec": 87.86
+          },
+          {
+            "label": "S6",
+            "start_sec": 87.86,
+            "end_sec": 91.86
+          },
+          {
+            "label": "S2",
+            "start_sec": 91.86,
+            "end_sec": 95.85
+          },
+          {
+            "label": "S0",
+            "start_sec": 95.85,
+            "end_sec": 99.85
+          },
+          {
+            "label": "S1",
+            "start_sec": 99.85,
+            "end_sec": 103.84
+          },
+          {
+            "label": "S0",
+            "start_sec": 103.84,
+            "end_sec": 107.83
+          },
+          {
+            "label": "S3",
+            "start_sec": 107.83,
+            "end_sec": 111.83
+          },
+          {
+            "label": "S0",
+            "start_sec": 111.83,
+            "end_sec": 115.82
+          },
+          {
+            "label": "S1",
+            "start_sec": 115.82,
+            "end_sec": 119.81
+          },
+          {
+            "label": "S0",
+            "start_sec": 119.81,
+            "end_sec": 123.81
+          },
+          {
+            "label": "S5",
+            "start_sec": 123.81,
+            "end_sec": 128.62
+          }
+        ],
+        "section_sequence": [
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S0",
+          "S1",
+          "S0",
+          "S1",
+          "S0",
+          "S1",
+          "S0",
+          "S5",
+          "S7",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S4",
+          "S6",
+          "S2",
+          "S0",
+          "S1",
+          "S0",
+          "S3",
+          "S0",
+          "S1",
+          "S0",
+          "S5"
+        ],
+        "n_sections": 32,
+        "n_unique_sections": 8,
+        "structural_repetition": 0.75,
+        "form_confidence": 1.0,
+        "notes": []
+      },
+      "C": {
+        "field_confidence": {
+          "rhythm": 1.0,
+          "melody": 0.7019108710588255,
+          "harmony": 0.95,
+          "motif": 1.0,
+          "form": 1.0
+        },
+        "overall_confidence": 0.9303821742117652,
+        "melody_harmony_agreement": 0.5838447595045125,
+        "warnings": [],
+        "notes": [
+          "Moderate melody/harmony alignment (agreement=0.58)"
+        ],
+        "disclaimer": "This output is a structural similarity aid derived from final mixed audio only. It is not a legal proof of plagiarism or authorship."
+      }
+    },
+    "cyanite": {
+      "genre_tags": [
+        "funkSoul"
+      ],
+      "subgenre_tags": [
+        "disco",
+        "funk",
+        "soul"
+      ],
+      "mood_tags": [
+        "chilled",
+        "happy"
+      ],
+      "mood_advanced_tags": [
+        "cheerful",
+        "optimistic",
+        "bright",
+        "quirky",
+        "confident"
+      ],
+      "movement_tags": [
+        "bouncy"
+      ],
+      "character_tags": [
+        "retro"
+      ],
+      "instrument_tags": [
+        "percussion",
+        "electricGuitar",
+        "synth",
+        "bassGuitar"
+      ],
+      "voice_tags": [
+        "instrumental"
+      ],
+      "energy_level": "medium",
+      "emotional_profile": "positive",
+      "valence": 0.7032,
+      "arousal": -0.0621,
+      "key": {
+        "value": "aMinor",
+        "confidence": 0.6479
+      },
+      "bpm": {
+        "value": 120,
+        "confidence": 0.9646
+      },
+      "bpm_range_adjusted": 120,
+      "time_signature": "4/4",
+      "musical_era": "early / mid 1990s",
+      "predominant_voice_gender": "none",
+      "voiceover_exists": false,
+      "caption": "80's synth pop with electric guitar."
+    },
+    "cyanite_source": "cyanite_live",
+    "song_genome_summary": {
+      "bpm": 117.45383522727273,
+      "time_signature": "4/4",
+      "key": "A",
+      "mode": "minor",
+      "key_confidence": 1.0,
+      "bpm_sources": {
+        "mgx": 117.45383522727273,
+        "cyanite": 120,
+        "chosen": 117.45383522727273
+      },
+      "key_sources": {
+        "mgx": "A minor",
+        "cyanite": "A minor",
+        "chosen": "A minor"
+      },
+      "mood": "chilled",
+      "moods": [
+        "chilled",
+        "happy"
+      ],
+      "energy": "medium",
+      "valence": 0.7032,
+      "arousal": -0.0621,
+      "genre": "funkSoul",
+      "genres": [
+        "funkSoul"
+      ],
+      "subgenres": [
+        "disco",
+        "funk",
+        "soul"
+      ],
+      "instrumentation": [
+        "percussion",
+        "electricGuitar",
+        "synth",
+        "bassGuitar"
+      ],
+      "cyanite_caption": "80's synth pop with electric guitar.",
+      "cyanite_source": "cyanite_live",
+      "form_sections": [
+        "S6",
+        "S2",
+        "S6",
+        "S2",
+        "S6",
+        "S2",
+        "S6",
+        "S2",
+        "S0",
+        "S1",
+        "S0",
+        "S1",
+        "S0",
+        "S1",
+        "S0",
+        "S5",
+        "S7",
+        "S2",
+        "S6",
+        "S2",
+        "S6",
+        "S4",
+        "S6",
+        "S2",
+        "S0",
+        "S1",
+        "S0",
+        "S3",
+        "S0",
+        "S1",
+        "S0",
+        "S5"
+      ],
+      "melodic_contour": -0.03747968947463441,
+      "harmonic_summary": {
+        "harmonic_change_rate": 0.03044748306274414,
+        "relative_chord_functions": [
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "VIdim",
+          "IV",
+          "IV7",
+          "IV",
+          "Im7",
+          "IV7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "VIm7",
+          "Im7",
+          "Imin",
+          "Im7",
+          "Imin",
+          "I",
+          "Im7",
+          "IV",
+          "IV7",
+          "IV",
+          "IV7",
+          "Im7",
+          "I5",
+          "Imin",
+          "I5",
+          "Vm7",
+          "bVII5",
+          "bVII",
+          "bVII5",
+          "IVm7",
+          "IV5",
+          "IVm7",
+          "IV7",
+          "I5",
+          "Imin",
+          "Im7",
+          "Vmin",
+          "bVII",
+          "IV7",
+          "IV5",
+          "IVmin",
+          "IV5",
+          "IVmin",
+          "IV5"
+        ]
+      },
+      "overall_confidence": 0.9303821742117652,
+      "warnings": [],
+      "vocal_midi": {
+        "n_notes": 233,
+        "suggested_syllable_slots": 233,
+        "cadence_profile": "descending (resolved/closing)",
+        "melodic_range": {
+          "min_pitch": 81,
+          "max_pitch": 96,
+          "min_pitch_name": "A5",
+          "max_pitch_name": "C7",
+          "range_semitones": 15
+        }
+      }
+    },
+    "vocal_midi": {
+      "type": "vocal_melody",
+      "n_notes": 233,
+      "duration_sec": 126.209,
+      "note_events": [
+        {
+          "start": 1.0,
+          "end": 1.1427,
+          "duration": 0.1427,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 1.25,
+          "end": 1.4542,
+          "duration": 0.2042,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 2.25,
+          "end": 2.5094,
+          "duration": 0.2594,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 2.5,
+          "end": 2.6958,
+          "duration": 0.1958,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 2.75,
+          "end": 3.0552,
+          "duration": 0.3052,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 3.5,
+          "end": 3.724,
+          "duration": 0.224,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 3.75,
+          "end": 3.8927,
+          "duration": 0.1427,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 87,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 4.0,
+          "end": 4.1271,
+          "duration": 0.1271,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 119,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 4.125,
+          "end": 4.3958,
+          "duration": 0.2708,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 4.5,
+          "end": 4.7313,
+          "duration": 0.2313,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 122,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 5.0,
+          "end": 5.3146,
+          "duration": 0.3146,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 5.5,
+          "end": 5.7427,
+          "duration": 0.2427,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 6.0,
+          "end": 6.2938,
+          "duration": 0.2938,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 123,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 6.5,
+          "end": 6.7854,
+          "duration": 0.2854,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 7.0,
+          "end": 7.2771,
+          "duration": 0.2771,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 7.5,
+          "end": 7.7708,
+          "duration": 0.2708,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 7.75,
+          "end": 8.0427,
+          "duration": 0.2927,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 9.0,
+          "end": 9.1344,
+          "duration": 0.1344,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 9.25,
+          "end": 9.4448,
+          "duration": 0.1948,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 10.25,
+          "end": 10.4615,
+          "duration": 0.2115,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 10.5,
+          "end": 10.7125,
+          "duration": 0.2125,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 10.75,
+          "end": 10.9812,
+          "duration": 0.2312,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 11.5,
+          "end": 11.7417,
+          "duration": 0.2417,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 11.75,
+          "end": 11.8917,
+          "duration": 0.1417,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 102,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 12.0,
+          "end": 12.1375,
+          "duration": 0.1375,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 121,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 12.125,
+          "end": 12.3969,
+          "duration": 0.2719,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 12.5,
+          "end": 12.75,
+          "duration": 0.25,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 123,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 13.0,
+          "end": 13.3094,
+          "duration": 0.3094,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 13.5,
+          "end": 13.7594,
+          "duration": 0.2594,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 98,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 14.0,
+          "end": 14.124,
+          "duration": 0.124,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 14.0,
+          "end": 14.2802,
+          "duration": 0.2802,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 14.5,
+          "end": 14.7667,
+          "duration": 0.2667,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 15.0,
+          "end": 15.2833,
+          "duration": 0.2833,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 15.5,
+          "end": 15.751,
+          "duration": 0.251,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 15.75,
+          "end": 16.0896,
+          "duration": 0.3396,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 16.75,
+          "end": 17.0094,
+          "duration": 0.2594,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 77,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 17.0,
+          "end": 17.1417,
+          "duration": 0.1417,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 17.25,
+          "end": 17.5125,
+          "duration": 0.2625,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 18.25,
+          "end": 18.524,
+          "duration": 0.274,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 18.5,
+          "end": 18.7563,
+          "duration": 0.2563,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 18.75,
+          "end": 18.9979,
+          "duration": 0.2479,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 19.5,
+          "end": 19.749,
+          "duration": 0.249,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 19.75,
+          "end": 19.8948,
+          "duration": 0.1448,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 98,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 20.0,
+          "end": 20.125,
+          "duration": 0.125,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 20.125,
+          "end": 20.3906,
+          "duration": 0.2656,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 20.5,
+          "end": 20.7583,
+          "duration": 0.2583,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 119,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 21.0,
+          "end": 21.3167,
+          "duration": 0.3167,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 21.5,
+          "end": 21.7854,
+          "duration": 0.2854,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 22.0,
+          "end": 22.2823,
+          "duration": 0.2823,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 22.5,
+          "end": 22.7698,
+          "duration": 0.2698,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 23.0,
+          "end": 23.3073,
+          "duration": 0.3073,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 23.5,
+          "end": 23.7594,
+          "duration": 0.2594,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 23.75,
+          "end": 24.0219,
+          "duration": 0.2719,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 24.75,
+          "end": 24.9792,
+          "duration": 0.2292,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 100,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 25.0,
+          "end": 25.149,
+          "duration": 0.149,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 101,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 25.25,
+          "end": 25.501,
+          "duration": 0.251,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 26.25,
+          "end": 26.5542,
+          "duration": 0.3042,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 98,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 26.5,
+          "end": 26.75,
+          "duration": 0.25,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 26.75,
+          "end": 26.9615,
+          "duration": 0.2115,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 27.5,
+          "end": 27.726,
+          "duration": 0.226,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 27.75,
+          "end": 27.8938,
+          "duration": 0.1438,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 96,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 28.0,
+          "end": 28.1604,
+          "duration": 0.1604,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 28.0,
+          "end": 28.2917,
+          "duration": 0.2917,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 101,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 28.5,
+          "end": 28.7458,
+          "duration": 0.2458,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 122,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 29.0,
+          "end": 29.2969,
+          "duration": 0.2969,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 29.5,
+          "end": 29.7281,
+          "duration": 0.2281,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 100,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 30.0,
+          "end": 30.1177,
+          "duration": 0.1177,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 30.125,
+          "end": 30.3438,
+          "duration": 0.2188,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 30.5,
+          "end": 30.749,
+          "duration": 0.249,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 31.0,
+          "end": 31.2063,
+          "duration": 0.2063,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 118,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 31.5,
+          "end": 31.7823,
+          "duration": 0.2823,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 31.75,
+          "end": 31.9365,
+          "duration": 0.1865,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 32.0,
+          "end": 32.3312,
+          "duration": 0.3313,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 32.5,
+          "end": 32.826,
+          "duration": 0.326,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 33.0,
+          "end": 33.3042,
+          "duration": 0.3042,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 33.5,
+          "end": 33.899,
+          "duration": 0.399,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 34.0,
+          "end": 34.3469,
+          "duration": 0.3469,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 34.5,
+          "end": 34.8385,
+          "duration": 0.3385,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 35.0,
+          "end": 35.1948,
+          "duration": 0.1948,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 35.25,
+          "end": 35.5063,
+          "duration": 0.2563,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 35.5,
+          "end": 35.7563,
+          "duration": 0.2563,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 35.75,
+          "end": 37.1594,
+          "duration": 1.4094,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 39.5,
+          "end": 39.6708,
+          "duration": 0.1708,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 39.75,
+          "end": 39.8802,
+          "duration": 0.1302,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 40.0,
+          "end": 40.3229,
+          "duration": 0.3229,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 40.5,
+          "end": 40.8313,
+          "duration": 0.3312,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 118,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 41.0,
+          "end": 41.3271,
+          "duration": 0.3271,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 41.5,
+          "end": 41.8458,
+          "duration": 0.3458,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 42.0,
+          "end": 42.326,
+          "duration": 0.326,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 42.5,
+          "end": 42.8198,
+          "duration": 0.3198,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 43.0,
+          "end": 43.2083,
+          "duration": 0.2083,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 43.25,
+          "end": 43.5302,
+          "duration": 0.2802,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 43.5,
+          "end": 43.7469,
+          "duration": 0.2469,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 100,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 43.75,
+          "end": 45.6115,
+          "duration": 1.8615,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 47.5,
+          "end": 47.6896,
+          "duration": 0.1896,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 47.75,
+          "end": 47.8938,
+          "duration": 0.1437,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 48.0,
+          "end": 48.3271,
+          "duration": 0.3271,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 119,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 48.5,
+          "end": 48.8385,
+          "duration": 0.3385,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 49.0,
+          "end": 49.3677,
+          "duration": 0.3677,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 100,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 49.5,
+          "end": 49.8865,
+          "duration": 0.3865,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 50.0,
+          "end": 50.1708,
+          "duration": 0.1708,
+          "pitch": 89,
+          "pitch_name": "F6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 50.0,
+          "end": 50.425,
+          "duration": 0.425,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 50.5,
+          "end": 51.0229,
+          "duration": 0.5229,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 77,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 51.0,
+          "end": 51.2917,
+          "duration": 0.2917,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 51.25,
+          "end": 51.5094,
+          "duration": 0.2594,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 51.5,
+          "end": 51.7406,
+          "duration": 0.2406,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 51.75,
+          "end": 53.7781,
+          "duration": 2.0281,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 55.5,
+          "end": 55.8,
+          "duration": 0.3,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 55.75,
+          "end": 55.9052,
+          "duration": 0.1552,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 56.0,
+          "end": 56.3448,
+          "duration": 0.3448,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 56.5,
+          "end": 56.8417,
+          "duration": 0.3417,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 57.0,
+          "end": 57.3583,
+          "duration": 0.3583,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 57.5,
+          "end": 57.8135,
+          "duration": 0.3135,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 58.0,
+          "end": 58.3208,
+          "duration": 0.3208,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 58.5,
+          "end": 58.7948,
+          "duration": 0.2948,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 59.0,
+          "end": 59.3146,
+          "duration": 0.3146,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 59.25,
+          "end": 59.5281,
+          "duration": 0.2781,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 59.5,
+          "end": 59.7438,
+          "duration": 0.2438,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 59.75,
+          "end": 62.6865,
+          "duration": 2.9365,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 65.0,
+          "end": 65.1281,
+          "duration": 0.1281,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 65.25,
+          "end": 65.4521,
+          "duration": 0.2021,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 66.25,
+          "end": 66.4438,
+          "duration": 0.1937,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 66.5,
+          "end": 66.6188,
+          "duration": 0.1188,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 66.75,
+          "end": 67.001,
+          "duration": 0.251,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 67.5,
+          "end": 67.7448,
+          "duration": 0.2448,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 67.75,
+          "end": 67.876,
+          "duration": 0.126,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 95,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 68.0,
+          "end": 68.1365,
+          "duration": 0.1365,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 121,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 68.125,
+          "end": 68.449,
+          "duration": 0.324,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 102,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 68.5,
+          "end": 68.7656,
+          "duration": 0.2656,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 123,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 69.0,
+          "end": 69.2885,
+          "duration": 0.2885,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 69.5,
+          "end": 69.7917,
+          "duration": 0.2917,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 70.0,
+          "end": 70.2885,
+          "duration": 0.2885,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 70.5,
+          "end": 70.8104,
+          "duration": 0.3104,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 71.0,
+          "end": 71.251,
+          "duration": 0.251,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 71.5,
+          "end": 71.7646,
+          "duration": 0.2646,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 71.75,
+          "end": 72.0354,
+          "duration": 0.2854,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 102,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 73.0,
+          "end": 73.1188,
+          "duration": 0.1188,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 73.25,
+          "end": 73.4667,
+          "duration": 0.2167,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 74.25,
+          "end": 74.3688,
+          "duration": 0.1188,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 74.5,
+          "end": 74.6531,
+          "duration": 0.1531,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 74.75,
+          "end": 74.926,
+          "duration": 0.176,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 75.5,
+          "end": 75.6667,
+          "duration": 0.1667,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 75.75,
+          "end": 75.8823,
+          "duration": 0.1323,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 76.0,
+          "end": 76.3021,
+          "duration": 0.3021,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 76.5,
+          "end": 76.7573,
+          "duration": 0.2573,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 124,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 77.0,
+          "end": 77.2563,
+          "duration": 0.2562,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 77.5,
+          "end": 77.7875,
+          "duration": 0.2875,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 78.0,
+          "end": 78.2594,
+          "duration": 0.2594,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 78.5,
+          "end": 78.7719,
+          "duration": 0.2719,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 79.0,
+          "end": 79.2281,
+          "duration": 0.2281,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 79.5,
+          "end": 79.7396,
+          "duration": 0.2396,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 79.75,
+          "end": 79.9969,
+          "duration": 0.2469,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 81.0,
+          "end": 81.0875,
+          "duration": 0.0875,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 81.25,
+          "end": 81.4917,
+          "duration": 0.2417,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 108,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 82.25,
+          "end": 82.5042,
+          "duration": 0.2542,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 82.5,
+          "end": 82.7552,
+          "duration": 0.2552,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 82.75,
+          "end": 83.0604,
+          "duration": 0.3104,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 83.25,
+          "end": 83.5448,
+          "duration": 0.2948,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 83.5,
+          "end": 83.7792,
+          "duration": 0.2792,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 83.75,
+          "end": 84.0,
+          "duration": 0.25,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 84.0,
+          "end": 84.4813,
+          "duration": 0.4813,
+          "pitch": 96,
+          "pitch_name": "C7",
+          "velocity": 97,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 84.5,
+          "end": 84.8938,
+          "duration": 0.3937,
+          "pitch": 95,
+          "pitch_name": "B6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 85.0,
+          "end": 85.4875,
+          "duration": 0.4875,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 85.5,
+          "end": 85.8354,
+          "duration": 0.3354,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 86.0,
+          "end": 86.3188,
+          "duration": 0.3187,
+          "pitch": 96,
+          "pitch_name": "C7",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 86.5,
+          "end": 86.849,
+          "duration": 0.349,
+          "pitch": 95,
+          "pitch_name": "B6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 87.0,
+          "end": 87.2885,
+          "duration": 0.2885,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 87.5,
+          "end": 87.7833,
+          "duration": 0.2833,
+          "pitch": 95,
+          "pitch_name": "B6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 87.75,
+          "end": 88.1167,
+          "duration": 0.3667,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 89.0,
+          "end": 89.1167,
+          "duration": 0.1167,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 89.25,
+          "end": 89.5302,
+          "duration": 0.2802,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 90.25,
+          "end": 90.5104,
+          "duration": 0.2604,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 90.5,
+          "end": 90.7417,
+          "duration": 0.2417,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 90.75,
+          "end": 91.2469,
+          "duration": 0.4969,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 91.5,
+          "end": 91.7344,
+          "duration": 0.2344,
+          "pitch": 93,
+          "pitch_name": "A6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 91.75,
+          "end": 92.0094,
+          "duration": 0.2594,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 92.0,
+          "end": 92.3802,
+          "duration": 0.3802,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 92.5,
+          "end": 92.8531,
+          "duration": 0.3531,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 123,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 93.0,
+          "end": 93.2667,
+          "duration": 0.2667,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 93.5,
+          "end": 93.7656,
+          "duration": 0.2656,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 94.0,
+          "end": 94.3104,
+          "duration": 0.3104,
+          "pitch": 90,
+          "pitch_name": "F#6",
+          "velocity": 121,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 94.5,
+          "end": 94.7729,
+          "duration": 0.2729,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 95.0,
+          "end": 95.1917,
+          "duration": 0.1917,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 95.5,
+          "end": 95.7375,
+          "duration": 0.2375,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 95.75,
+          "end": 95.85,
+          "duration": 0.1,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 96.0,
+          "end": 96.3146,
+          "duration": 0.3146,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 122,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 96.5,
+          "end": 96.8198,
+          "duration": 0.3198,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 118,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 97.0,
+          "end": 97.3104,
+          "duration": 0.3104,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 97.5,
+          "end": 97.8771,
+          "duration": 0.3771,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 98.0,
+          "end": 98.3531,
+          "duration": 0.3531,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 105,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 98.5,
+          "end": 98.8052,
+          "duration": 0.3052,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 119,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 99.0,
+          "end": 99.1646,
+          "duration": 0.1646,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 99.25,
+          "end": 99.5208,
+          "duration": 0.2708,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 99.5,
+          "end": 99.7146,
+          "duration": 0.2146,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 99.75,
+          "end": 102.2938,
+          "duration": 2.5438,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 103.5,
+          "end": 103.6594,
+          "duration": 0.1594,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 103.75,
+          "end": 103.8458,
+          "duration": 0.0958,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 104.0,
+          "end": 104.3031,
+          "duration": 0.3031,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 119,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 104.5,
+          "end": 104.8156,
+          "duration": 0.3156,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 120,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 105.0,
+          "end": 105.3042,
+          "duration": 0.3042,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 105.5,
+          "end": 105.8635,
+          "duration": 0.3635,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 112,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 106.0,
+          "end": 106.3,
+          "duration": 0.3,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 106.5,
+          "end": 106.7938,
+          "duration": 0.2938,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 107.0,
+          "end": 107.2688,
+          "duration": 0.2687,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 107.25,
+          "end": 107.5448,
+          "duration": 0.2948,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 107.5,
+          "end": 107.7542,
+          "duration": 0.2542,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 113,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 107.75,
+          "end": 108.2302,
+          "duration": 0.4802,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 116,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 108.25,
+          "end": 109.95,
+          "duration": 1.7,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 111.5,
+          "end": 111.699,
+          "duration": 0.199,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 111.75,
+          "end": 111.8802,
+          "duration": 0.1302,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 80,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 112.0,
+          "end": 112.3438,
+          "duration": 0.3438,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 117,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 112.5,
+          "end": 112.9073,
+          "duration": 0.4073,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 102,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 113.0,
+          "end": 113.3229,
+          "duration": 0.3229,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 97,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 113.5,
+          "end": 113.8135,
+          "duration": 0.3135,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 114.0,
+          "end": 114.3844,
+          "duration": 0.3844,
+          "pitch": 91,
+          "pitch_name": "G6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 114.5,
+          "end": 114.9656,
+          "duration": 0.4656,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 99,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 115.0,
+          "end": 115.1927,
+          "duration": 0.1927,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 74,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 115.25,
+          "end": 115.6229,
+          "duration": 0.3729,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 89,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 115.5,
+          "end": 115.7083,
+          "duration": 0.2083,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 80,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 115.75,
+          "end": 115.8865,
+          "duration": 0.1365,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 107,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 115.875,
+          "end": 117.074,
+          "duration": 1.199,
+          "pitch": 89,
+          "pitch_name": "F6",
+          "velocity": 110,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 119.5,
+          "end": 119.676,
+          "duration": 0.176,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 119.75,
+          "end": 119.899,
+          "duration": 0.149,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 104,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 120.0,
+          "end": 120.3208,
+          "duration": 0.3208,
+          "pitch": 88,
+          "pitch_name": "E6",
+          "velocity": 114,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 120.5,
+          "end": 120.7625,
+          "duration": 0.2625,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 115,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 121.0,
+          "end": 121.3271,
+          "duration": 0.3271,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 109,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 121.5,
+          "end": 121.7781,
+          "duration": 0.2781,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 97,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 122.0,
+          "end": 122.301,
+          "duration": 0.301,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 98,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 122.5,
+          "end": 122.7458,
+          "duration": 0.2458,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 123.0,
+          "end": 123.3365,
+          "duration": 0.3365,
+          "pitch": 86,
+          "pitch_name": "D6",
+          "velocity": 106,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 123.25,
+          "end": 123.5042,
+          "duration": 0.2542,
+          "pitch": 84,
+          "pitch_name": "C6",
+          "velocity": 103,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 123.5,
+          "end": 123.6833,
+          "duration": 0.1833,
+          "pitch": 83,
+          "pitch_name": "B5",
+          "velocity": 111,
+          "beat_position_estimate": null
+        },
+        {
+          "start": 123.75,
+          "end": 126.2094,
+          "duration": 2.4594,
+          "pitch": 81,
+          "pitch_name": "A5",
+          "velocity": 107,
+          "beat_position_estimate": null
+        }
+      ],
+      "phrase_estimates": [
+        {
+          "index": 0,
+          "start": 1.0,
+          "end": 1.4542,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 1,
+          "start": 2.25,
+          "end": 3.0552,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 2,
+          "start": 3.5,
+          "end": 8.0427,
+          "n_notes": 12,
+          "syllable_slots": 12
+        },
+        {
+          "index": 3,
+          "start": 9.0,
+          "end": 9.4448,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 4,
+          "start": 10.25,
+          "end": 10.9812,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 5,
+          "start": 11.5,
+          "end": 16.0896,
+          "n_notes": 13,
+          "syllable_slots": 13
+        },
+        {
+          "index": 6,
+          "start": 16.75,
+          "end": 17.5125,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 7,
+          "start": 18.25,
+          "end": 18.9979,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 8,
+          "start": 19.5,
+          "end": 24.0219,
+          "n_notes": 12,
+          "syllable_slots": 12
+        },
+        {
+          "index": 9,
+          "start": 24.75,
+          "end": 25.501,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 10,
+          "start": 26.25,
+          "end": 26.9615,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 11,
+          "start": 27.5,
+          "end": 37.1594,
+          "n_notes": 23,
+          "syllable_slots": 23
+        },
+        {
+          "index": 12,
+          "start": 39.5,
+          "end": 45.6115,
+          "n_notes": 12,
+          "syllable_slots": 12
+        },
+        {
+          "index": 13,
+          "start": 47.5,
+          "end": 53.7781,
+          "n_notes": 13,
+          "syllable_slots": 13
+        },
+        {
+          "index": 14,
+          "start": 55.5,
+          "end": 62.6865,
+          "n_notes": 12,
+          "syllable_slots": 12
+        },
+        {
+          "index": 15,
+          "start": 65.0,
+          "end": 65.4521,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 16,
+          "start": 66.25,
+          "end": 67.001,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 17,
+          "start": 67.5,
+          "end": 72.0354,
+          "n_notes": 12,
+          "syllable_slots": 12
+        },
+        {
+          "index": 18,
+          "start": 73.0,
+          "end": 73.4667,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 19,
+          "start": 74.25,
+          "end": 74.926,
+          "n_notes": 3,
+          "syllable_slots": 3
+        },
+        {
+          "index": 20,
+          "start": 75.5,
+          "end": 79.9969,
+          "n_notes": 11,
+          "syllable_slots": 11
+        },
+        {
+          "index": 21,
+          "start": 81.0,
+          "end": 81.4917,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 22,
+          "start": 82.25,
+          "end": 88.1167,
+          "n_notes": 15,
+          "syllable_slots": 15
+        },
+        {
+          "index": 23,
+          "start": 89.0,
+          "end": 89.5302,
+          "n_notes": 2,
+          "syllable_slots": 2
+        },
+        {
+          "index": 24,
+          "start": 90.25,
+          "end": 102.2938,
+          "n_notes": 24,
+          "syllable_slots": 24
+        },
+        {
+          "index": 25,
+          "start": 103.5,
+          "end": 109.95,
+          "n_notes": 13,
+          "syllable_slots": 13
+        },
+        {
+          "index": 26,
+          "start": 111.5,
+          "end": 117.074,
+          "n_notes": 13,
+          "syllable_slots": 13
+        },
+        {
+          "index": 27,
+          "start": 119.5,
+          "end": 126.2094,
+          "n_notes": 12,
+          "syllable_slots": 12
+        }
+      ],
+      "melodic_range": {
+        "min_pitch": 81,
+        "max_pitch": 96,
+        "min_pitch_name": "A5",
+        "max_pitch_name": "C7",
+        "range_semitones": 15
+      },
+      "average_note_duration": 0.3223,
+      "suggested_syllable_slots": 233,
+      "strong_positions": [
+        1.0,
+        2.5,
+        3.5,
+        4.0,
+        4.5,
+        5.0,
+        5.5,
+        6.0,
+        6.5,
+        7.0,
+        7.5,
+        9.0,
+        10.5,
+        11.5,
+        12.0,
+        12.5,
+        13.0,
+        13.5,
+        14.0,
+        14.0,
+        14.5,
+        15.0,
+        15.5,
+        17.0,
+        18.5,
+        19.5,
+        20.0,
+        20.5,
+        21.0,
+        21.5,
+        22.0,
+        22.5,
+        23.0,
+        23.5,
+        25.0,
+        26.5,
+        27.5,
+        28.0,
+        28.0,
+        28.5,
+        29.0,
+        29.5,
+        30.0,
+        30.5,
+        31.0,
+        31.5,
+        32.0,
+        32.5,
+        33.0,
+        33.5,
+        34.0,
+        34.5,
+        35.0,
+        35.5,
+        39.5,
+        40.0,
+        40.5,
+        41.0,
+        41.5,
+        42.0,
+        42.5,
+        43.0,
+        43.5,
+        47.5,
+        48.0,
+        48.5,
+        49.0,
+        49.5,
+        50.0,
+        50.0,
+        50.5,
+        51.0,
+        51.5,
+        55.5,
+        56.0,
+        56.5,
+        57.0,
+        57.5,
+        58.0,
+        58.5,
+        59.0,
+        59.5,
+        65.0,
+        66.5,
+        67.5,
+        68.0,
+        68.5,
+        69.0,
+        69.5,
+        70.0,
+        70.5,
+        71.0,
+        71.5,
+        73.0,
+        74.5,
+        75.5,
+        76.0,
+        76.5,
+        77.0,
+        77.5,
+        78.0,
+        78.5,
+        79.0,
+        79.5,
+        81.0,
+        82.5,
+        83.5,
+        84.0,
+        84.5,
+        85.0,
+        85.5,
+        86.0,
+        86.5,
+        87.0,
+        87.5,
+        89.0,
+        90.5,
+        91.5,
+        92.0,
+        92.5,
+        93.0,
+        93.5,
+        94.0,
+        94.5,
+        95.0,
+        95.5,
+        96.0,
+        96.5,
+        97.0,
+        97.5,
+        98.0,
+        98.5,
+        99.0,
+        99.5,
+        103.5,
+        104.0,
+        104.5,
+        105.0,
+        105.5,
+        106.0,
+        106.5,
+        107.0,
+        107.5,
+        111.5,
+        112.0,
+        112.5,
+        113.0,
+        113.5,
+        114.0,
+        114.5,
+        115.0,
+        115.5,
+        119.5,
+        120.0,
+        120.5,
+        121.0,
+        121.5,
+        122.0,
+        122.5,
+        123.0,
+        123.5
+      ],
+      "cadence_profile": "descending (resolved/closing)",
+      "warnings": []
+    },
     "backing_midi": {},
-    "lyrics_structure": {},
-    "lyrics_prosody": {},
-    "text_mining": {},
-    "writing_brief": {},
-    "reference_profile": {},
-    "generated_draft": {},
-    "composition_brief": {}
+    "lyrics_structure": {
+      "normalized_text": "I saw a child draw borders\n\nWith a stick in the sand\n\nThen the tide came laughing softly\n\nAnd erased them from the land\n\nA woman lit a candle\n\nIn a window full of rain\n\nSaid, “May the ones who hate me\n\nFind their way back home again”\n\n\nAnd all the guns are heavy\n\nWhen the heart has had enough\n\nMaybe peace begins in silence\n\nMaybe silence turns to love\n\n\nSo lay your weapons down\n\nLet the sky come closer\n\nLet the broken cities breathe\n\nLet the world get sober\n\nWe are more than flags\n\nMore than wounds we carry\n\nWith our hands open wide\n\nWe can still be ordinary",
+      "n_lines": 20,
+      "n_stanzas": 20,
+      "n_words": 110,
+      "stanzas": [
+        [
+          "I saw a child draw borders"
+        ],
+        [
+          "With a stick in the sand"
+        ],
+        [
+          "Then the tide came laughing softly"
+        ],
+        [
+          "And erased them from the land"
+        ],
+        [
+          "A woman lit a candle"
+        ],
+        [
+          "In a window full of rain"
+        ],
+        [
+          "Said, “May the ones who hate me"
+        ],
+        [
+          "Find their way back home again”"
+        ],
+        [
+          "And all the guns are heavy"
+        ],
+        [
+          "When the heart has had enough"
+        ],
+        [
+          "Maybe peace begins in silence"
+        ],
+        [
+          "Maybe silence turns to love"
+        ],
+        [
+          "So lay your weapons down"
+        ],
+        [
+          "Let the sky come closer"
+        ],
+        [
+          "Let the broken cities breathe"
+        ],
+        [
+          "Let the world get sober"
+        ],
+        [
+          "We are more than flags"
+        ],
+        [
+          "More than wounds we carry"
+        ],
+        [
+          "With our hands open wide"
+        ],
+        [
+          "We can still be ordinary"
+        ]
+      ],
+      "repeated_lines": [],
+      "most_common_words": [
+        {
+          "word": "the",
+          "count": 9
+        },
+        {
+          "word": "a",
+          "count": 5
+        },
+        {
+          "word": "in",
+          "count": 3
+        },
+        {
+          "word": "let",
+          "count": 3
+        },
+        {
+          "word": "we",
+          "count": 3
+        },
+        {
+          "word": "with",
+          "count": 2
+        },
+        {
+          "word": "and",
+          "count": 2
+        },
+        {
+          "word": "are",
+          "count": 2
+        },
+        {
+          "word": "maybe",
+          "count": 2
+        },
+        {
+          "word": "silence",
+          "count": 2
+        },
+        {
+          "word": "more",
+          "count": 2
+        },
+        {
+          "word": "than",
+          "count": 2
+        },
+        {
+          "word": "i",
+          "count": 1
+        },
+        {
+          "word": "saw",
+          "count": 1
+        },
+        {
+          "word": "child",
+          "count": 1
+        },
+        {
+          "word": "draw",
+          "count": 1
+        },
+        {
+          "word": "borders",
+          "count": 1
+        },
+        {
+          "word": "stick",
+          "count": 1
+        },
+        {
+          "word": "sand",
+          "count": 1
+        },
+        {
+          "word": "then",
+          "count": 1
+        }
+      ],
+      "rhyme_endings": [
+        "ers",
+        "and",
+        "tly",
+        "and",
+        "dle",
+        "ain",
+        "me",
+        "ain",
+        "avy",
+        "ugh",
+        "nce",
+        "ove",
+        "own",
+        "ser",
+        "the",
+        "ber",
+        "ags",
+        "rry",
+        "ide",
+        "ary"
+      ]
+    },
+    "lyrics_prosody": {
+      "language": "en",
+      "lines": [
+        {
+          "line_index": 0,
+          "text": "I saw a child draw borders",
+          "word_count": 6,
+          "estimated_syllables": 7,
+          "ending_word": "borders",
+          "ending_phonetic_hint": "ers",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 1,
+          "text": "With a stick in the sand",
+          "word_count": 6,
+          "estimated_syllables": 6,
+          "ending_word": "sand",
+          "ending_phonetic_hint": "and",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 2,
+          "text": "Then the tide came laughing softly",
+          "word_count": 6,
+          "estimated_syllables": 8,
+          "ending_word": "softly",
+          "ending_phonetic_hint": "tly",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 3,
+          "text": "And erased them from the land",
+          "word_count": 6,
+          "estimated_syllables": 8,
+          "ending_word": "land",
+          "ending_phonetic_hint": "and",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 4,
+          "text": "A woman lit a candle",
+          "word_count": 5,
+          "estimated_syllables": 7,
+          "ending_word": "candle",
+          "ending_phonetic_hint": "dle",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 5,
+          "text": "In a window full of rain",
+          "word_count": 6,
+          "estimated_syllables": 7,
+          "ending_word": "rain",
+          "ending_phonetic_hint": "ain",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 6,
+          "text": "Said, “May the ones who hate me",
+          "word_count": 7,
+          "estimated_syllables": 8,
+          "ending_word": "me",
+          "ending_phonetic_hint": "me",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 7,
+          "text": "Find their way back home again”",
+          "word_count": 6,
+          "estimated_syllables": 7,
+          "ending_word": "again",
+          "ending_phonetic_hint": "ain",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 8,
+          "text": "And all the guns are heavy",
+          "word_count": 6,
+          "estimated_syllables": 7,
+          "ending_word": "heavy",
+          "ending_phonetic_hint": "avy",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 9,
+          "text": "When the heart has had enough",
+          "word_count": 6,
+          "estimated_syllables": 7,
+          "ending_word": "enough",
+          "ending_phonetic_hint": "ugh",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 10,
+          "text": "Maybe peace begins in silence",
+          "word_count": 5,
+          "estimated_syllables": 7,
+          "ending_word": "silence",
+          "ending_phonetic_hint": "nce",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 11,
+          "text": "Maybe silence turns to love",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "love",
+          "ending_phonetic_hint": "ove",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 12,
+          "text": "So lay your weapons down",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "down",
+          "ending_phonetic_hint": "own",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 13,
+          "text": "Let the sky come closer",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "closer",
+          "ending_phonetic_hint": "ser",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 14,
+          "text": "Let the broken cities breathe",
+          "word_count": 5,
+          "estimated_syllables": 7,
+          "ending_word": "breathe",
+          "ending_phonetic_hint": "the",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 15,
+          "text": "Let the world get sober",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "sober",
+          "ending_phonetic_hint": "ber",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 16,
+          "text": "We are more than flags",
+          "word_count": 5,
+          "estimated_syllables": 5,
+          "ending_word": "flags",
+          "ending_phonetic_hint": "ags",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 17,
+          "text": "More than wounds we carry",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "carry",
+          "ending_phonetic_hint": "rry",
+          "stress_hint": "variable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 18,
+          "text": "With our hands open wide",
+          "word_count": 5,
+          "estimated_syllables": 6,
+          "ending_word": "wide",
+          "ending_phonetic_hint": "ide",
+          "stress_hint": "monosyllable",
+          "is_repeated": false
+        },
+        {
+          "line_index": 19,
+          "text": "We can still be ordinary",
+          "word_count": 5,
+          "estimated_syllables": 8,
+          "ending_word": "ordinary",
+          "ending_phonetic_hint": "ary",
+          "stress_hint": "variable",
+          "is_repeated": false
+        }
+      ],
+      "average_syllables_per_line": 6.75,
+      "syllable_variance": 0.69,
+      "rhyme_candidates": [
+        {
+          "ending": "and",
+          "line_indices": [
+            1,
+            3
+          ]
+        },
+        {
+          "ending": "ain",
+          "line_indices": [
+            5,
+            7
+          ]
+        }
+      ],
+      "warnings": []
+    },
+    "text_mining": {
+      "n_raw_tokens": 110,
+      "n_filtered_tokens": 59,
+      "tokens": [
+        "saw",
+        "child",
+        "draw",
+        "borders",
+        "stick",
+        "sand",
+        "tide",
+        "came",
+        "laughing",
+        "softly",
+        "erased",
+        "land",
+        "woman",
+        "lit",
+        "candle",
+        "window",
+        "full",
+        "rain",
+        "said",
+        "“may",
+        "ones",
+        "hate",
+        "find",
+        "way",
+        "back",
+        "home",
+        "again”",
+        "guns",
+        "heavy",
+        "heart",
+        "enough",
+        "maybe",
+        "peace",
+        "begins",
+        "silence",
+        "maybe",
+        "silence",
+        "turns",
+        "love",
+        "lay",
+        "weapons",
+        "let",
+        "sky",
+        "closer",
+        "let",
+        "broken",
+        "cities",
+        "breathe",
+        "let",
+        "world",
+        "get",
+        "sober",
+        "flags",
+        "wounds",
+        "carry",
+        "hands",
+        "open",
+        "wide",
+        "ordinary"
+      ],
+      "word_frequencies": {
+        "let": 3,
+        "maybe": 2,
+        "silence": 2,
+        "saw": 1,
+        "child": 1,
+        "draw": 1,
+        "borders": 1,
+        "stick": 1,
+        "sand": 1,
+        "tide": 1,
+        "came": 1,
+        "laughing": 1,
+        "softly": 1,
+        "erased": 1,
+        "land": 1,
+        "woman": 1,
+        "lit": 1,
+        "candle": 1,
+        "window": 1,
+        "full": 1,
+        "rain": 1,
+        "said": 1,
+        "“may": 1,
+        "ones": 1,
+        "hate": 1,
+        "find": 1,
+        "way": 1,
+        "back": 1,
+        "home": 1,
+        "again”": 1,
+        "guns": 1,
+        "heavy": 1,
+        "heart": 1,
+        "enough": 1,
+        "peace": 1,
+        "begins": 1,
+        "turns": 1,
+        "love": 1,
+        "lay": 1,
+        "weapons": 1,
+        "sky": 1,
+        "closer": 1,
+        "broken": 1,
+        "cities": 1,
+        "breathe": 1,
+        "world": 1,
+        "get": 1,
+        "sober": 1,
+        "flags": 1,
+        "wounds": 1,
+        "carry": 1,
+        "hands": 1,
+        "open": 1,
+        "wide": 1,
+        "ordinary": 1
+      },
+      "bigrams": {
+        "saw child": 1,
+        "child draw": 1,
+        "draw borders": 1,
+        "borders stick": 1,
+        "stick sand": 1,
+        "sand tide": 1,
+        "tide came": 1,
+        "came laughing": 1,
+        "laughing softly": 1,
+        "softly erased": 1,
+        "erased land": 1,
+        "land woman": 1,
+        "woman lit": 1,
+        "lit candle": 1,
+        "candle window": 1,
+        "window full": 1,
+        "full rain": 1,
+        "rain said": 1,
+        "said “may": 1,
+        "“may ones": 1,
+        "ones hate": 1,
+        "hate find": 1,
+        "find way": 1,
+        "way back": 1,
+        "back home": 1,
+        "home again”": 1,
+        "again” guns": 1,
+        "guns heavy": 1,
+        "heavy heart": 1,
+        "heart enough": 1,
+        "enough maybe": 1,
+        "maybe peace": 1,
+        "peace begins": 1,
+        "begins silence": 1,
+        "silence maybe": 1,
+        "maybe silence": 1,
+        "silence turns": 1,
+        "turns love": 1,
+        "love lay": 1,
+        "lay weapons": 1,
+        "weapons let": 1,
+        "let sky": 1,
+        "sky closer": 1,
+        "closer let": 1,
+        "let broken": 1,
+        "broken cities": 1,
+        "cities breathe": 1,
+        "breathe let": 1,
+        "let world": 1,
+        "world get": 1,
+        "get sober": 1,
+        "sober flags": 1,
+        "flags wounds": 1,
+        "wounds carry": 1,
+        "carry hands": 1,
+        "hands open": 1,
+        "open wide": 1,
+        "wide ordinary": 1
+      },
+      "trigrams": {
+        "saw child draw": 1,
+        "child draw borders": 1,
+        "draw borders stick": 1,
+        "borders stick sand": 1,
+        "stick sand tide": 1,
+        "sand tide came": 1,
+        "tide came laughing": 1,
+        "came laughing softly": 1,
+        "laughing softly erased": 1,
+        "softly erased land": 1,
+        "erased land woman": 1,
+        "land woman lit": 1,
+        "woman lit candle": 1,
+        "lit candle window": 1,
+        "candle window full": 1,
+        "window full rain": 1,
+        "full rain said": 1,
+        "rain said “may": 1,
+        "said “may ones": 1,
+        "“may ones hate": 1,
+        "ones hate find": 1,
+        "hate find way": 1,
+        "find way back": 1,
+        "way back home": 1,
+        "back home again”": 1,
+        "home again” guns": 1,
+        "again” guns heavy": 1,
+        "guns heavy heart": 1,
+        "heavy heart enough": 1,
+        "heart enough maybe": 1,
+        "enough maybe peace": 1,
+        "maybe peace begins": 1,
+        "peace begins silence": 1,
+        "begins silence maybe": 1,
+        "silence maybe silence": 1,
+        "maybe silence turns": 1,
+        "silence turns love": 1,
+        "turns love lay": 1,
+        "love lay weapons": 1,
+        "lay weapons let": 1,
+        "weapons let sky": 1,
+        "let sky closer": 1,
+        "sky closer let": 1,
+        "closer let broken": 1,
+        "let broken cities": 1,
+        "broken cities breathe": 1,
+        "cities breathe let": 1,
+        "breathe let world": 1,
+        "let world get": 1,
+        "world get sober": 1,
+        "get sober flags": 1,
+        "sober flags wounds": 1,
+        "flags wounds carry": 1,
+        "wounds carry hands": 1,
+        "carry hands open": 1,
+        "hands open wide": 1,
+        "open wide ordinary": 1
+      },
+      "cooccurrences": {
+        "maybe + silence": 4,
+        "closer + let": 3,
+        "broken + let": 3,
+        "cities + let": 3,
+        "enough + maybe": 2,
+        "maybe + peace": 2,
+        "begins + maybe": 2,
+        "peace + silence": 2,
+        "begins + silence": 2,
+        "silence + turns": 2,
+        "love + silence": 2,
+        "lay + silence": 2,
+        "lay + let": 2,
+        "let + weapons": 2,
+        "let + sky": 2,
+        "let + let": 2,
+        "breathe + let": 2,
+        "let + world": 2,
+        "child + saw": 1,
+        "draw + saw": 1,
+        "borders + saw": 1,
+        "saw + stick": 1,
+        "sand + saw": 1,
+        "child + draw": 1,
+        "borders + child": 1,
+        "child + stick": 1,
+        "child + sand": 1,
+        "child + tide": 1,
+        "borders + draw": 1,
+        "draw + stick": 1,
+        "draw + sand": 1,
+        "draw + tide": 1,
+        "came + draw": 1,
+        "borders + stick": 1,
+        "borders + sand": 1,
+        "borders + tide": 1,
+        "borders + came": 1,
+        "borders + laughing": 1,
+        "sand + stick": 1,
+        "stick + tide": 1,
+        "came + stick": 1,
+        "laughing + stick": 1,
+        "softly + stick": 1,
+        "sand + tide": 1,
+        "came + sand": 1,
+        "laughing + sand": 1,
+        "sand + softly": 1,
+        "erased + sand": 1,
+        "came + tide": 1,
+        "laughing + tide": 1,
+        "softly + tide": 1,
+        "erased + tide": 1,
+        "land + tide": 1,
+        "came + laughing": 1,
+        "came + softly": 1,
+        "came + erased": 1,
+        "came + land": 1,
+        "came + woman": 1,
+        "laughing + softly": 1,
+        "erased + laughing": 1,
+        "land + laughing": 1,
+        "laughing + woman": 1,
+        "laughing + lit": 1,
+        "erased + softly": 1,
+        "land + softly": 1,
+        "softly + woman": 1,
+        "lit + softly": 1,
+        "candle + softly": 1,
+        "erased + land": 1,
+        "erased + woman": 1,
+        "erased + lit": 1,
+        "candle + erased": 1,
+        "erased + window": 1,
+        "land + woman": 1,
+        "land + lit": 1,
+        "candle + land": 1,
+        "land + window": 1,
+        "full + land": 1,
+        "lit + woman": 1,
+        "candle + woman": 1,
+        "window + woman": 1,
+        "full + woman": 1,
+        "rain + woman": 1,
+        "candle + lit": 1,
+        "lit + window": 1,
+        "full + lit": 1,
+        "lit + rain": 1,
+        "lit + said": 1,
+        "candle + window": 1,
+        "candle + full": 1,
+        "candle + rain": 1,
+        "candle + said": 1,
+        "candle + “may": 1,
+        "full + window": 1,
+        "rain + window": 1,
+        "said + window": 1,
+        "window + “may": 1,
+        "ones + window": 1,
+        "full + rain": 1,
+        "full + said": 1
+      },
+      "kwic": {},
+      "lexical_fields": []
+    },
+    "writing_brief": {
+      "core_theme": "Searching for connection through mojitos",
+      "point_of_view_options": [
+        "First-person as a bartender reflecting on patrons' stories",
+        "First-person as a lonely drinker reminiscing on past love",
+        "First-person as a friend trying to comfort a grieving companion"
+      ],
+      "emotional_temperature": "bittersweet sips of nostalgia and longing",
+      "possible_scenes": [
+        "A dimly lit bar with clinking glasses, where the protagonist crafts mojitos while observing the world outside",
+        "A sun-drenched patio where a couple shares laughter and secrets over their drinks, now just a memory",
+        "An empty kitchen at midnight, where the protagonist mixes ingredients alone, the sound of ice clinking echoing the silence"
+      ],
+      "lexical_fields": [
+        "mixology",
+        "memory",
+        "bittersweet",
+        "connection",
+        "loss",
+        "refreshment",
+        "nostalgia",
+        "reflection"
+      ],
+      "images_to_avoid": [
+        "drowning sorrows",
+        "tropical paradise",
+        "frozen in time",
+        "pouring one's heart out",
+        "cloudy skies"
+      ],
+      "promising_images": [
+        "fresh mint leaves trembling in the breeze",
+        "a glass sweating under the heat of a long summer day",
+        "the sound of laughter fading into the night"
+      ],
+      "possible_titles": [
+        "Mojito Memories",
+        "Sips of Solitude",
+        "Bittersweet Mix"
+      ],
+      "chorus_concepts": [
+        "A repetition of the act of making mojitos, mirroring the protagonist's attempts to reclaim lost moments, with a haunting refrain about the taste of solitude.",
+        "A contrast between the bright flavors of mojitos and the shadows of loneliness, using the drink as a metaphor for fleeting joy and lingering sorrow."
+      ],
+      "narrative_arc_options": [
+        "A moment of joy at the bar -> a memory surfaces -> the realization of loss",
+        "Crafting a drink for a friend -> the friend’s absence becomes palpable -> finding solace in shared memories",
+        "Serving mojitos to couples -> feeling the weight of solitude -> a decision to reach out for connection"
+      ],
+      "source": "ai",
+      "copyright_safe_note": "AI-generated brief: abstract directions and original seed images only. No existing song is reproduced. The songwriter remains the author."
+    },
+    "reference_profile": {
+      "source": "musixmatch_live",
+      "provider_status": {
+        "mode": "real",
+        "musixmatch": "live",
+        "cyanite": "live"
+      },
+      "fallback_reason": null,
+      "copyright_safe": true,
+      "stored_content_policy": "abstract_descriptors_only_no_lyrics",
+      "artists": [
+        "depeche mode"
+      ],
+      "reference_songs": [],
+      "grounded_in_real_catalog": true,
+      "reference_artist_profiles": [
+        {
+          "artist": "depeche mode",
+          "themes": [
+            "spiritual connection",
+            "loneliness and seeking support",
+            "forgiveness and redemption",
+            "support and reassurance",
+            "loss and farewell",
+            "transience and fleeting moments",
+            "hope and dreams",
+            "emotional pain and longing",
+            "the inadequacy of words",
+            "desire for connection"
+          ],
+          "moods": [
+            "angst",
+            "love",
+            "reflection",
+            "despair",
+            "spirituality",
+            "solitude"
+          ],
+          "entities": [
+            "jesus"
+          ],
+          "genres": [
+            "Electronic",
+            "Pop",
+            "Alternative",
+            "Rock",
+            "Pop/Rock"
+          ],
+          "n_tracks_analyzed": 5,
+          "source": "musixmatch_analysis"
+        }
+      ],
+      "abstract_patterns": {
+        "common_themes": [
+          "spiritual connection",
+          "loneliness and seeking support",
+          "forgiveness and redemption",
+          "support and reassurance",
+          "loss and farewell",
+          "transience and fleeting moments",
+          "hope and dreams",
+          "emotional pain and longing",
+          "sensual"
+        ],
+        "lexical_fields": [
+          "spiritual connection",
+          "loneliness and seeking support",
+          "forgiveness and redemption",
+          "support and reassurance",
+          "loss and farewell",
+          "transience and fleeting moments",
+          "hope and dreams",
+          "emotional pain and longing",
+          "the inadequacy of words",
+          "desire for connection",
+          "jesus",
+          "desire and longing",
+          "devotion and obedience",
+          "femininity and playfulness",
+          "transformation and execution"
+        ],
+        "dominant_moods": [
+          "angst",
+          "love",
+          "reflection",
+          "despair",
+          "spirituality",
+          "solitude"
+        ],
+        "genres": [
+          "Electronic",
+          "Pop",
+          "Alternative",
+          "Rock",
+          "Pop/Rock"
+        ],
+        "imagery_density": "mid — balance of statement and image",
+        "narrative_stance": "first-person reflective",
+        "typical_energy": "mid",
+        "verse_style": "regular lines establishing situation",
+        "chorus_style": "memorable repeated phrase",
+        "symbolic_register": [
+          "jesus"
+        ]
+      },
+      "safe_inspiration_rules": [
+        "Do not copy lyrics",
+        "Do not imitate exact style",
+        "Use only abstract patterns"
+      ],
+      "creative_constraints": [
+        "Aim for a chorus that is memorable repeated phrase.",
+        "Build verses that are regular lines establishing situation.",
+        "Target imagery density: mid — balance of statement and image.",
+        "References' real catalog leans toward moods: angst, love, reflection, despair.",
+        "Recurring themes in the references: spiritual connection, loneliness and seeking support, forgiveness and redemption, support and reassurance, loss and farewell."
+      ],
+      "avoid": [
+        "Avoid reproducing any recognizable melodic or lyrical phrase from references."
+      ]
+    },
+    "generated_draft": {
+      "title": "Mojito Reflections",
+      "language": "en",
+      "sections": [
+        {
+          "type": "verse",
+          "lines": [
+            "I sigh",
+            "and mix,",
+            "a splash of something sweet, a hint of lime,",
+            "to chill,",
+            "and serve,",
+            "where laughter danced, the good times rhyme.",
+            "Fresh mint,",
+            "melts slow,",
+            "as echoes wrap around the glass so tight,",
+            "I glimpse,",
+            "the past,",
+            "in every swirl, where shadows fight.",
+            "Sweet whispers,",
+            "from long ago,",
+            "come drifting back with every clink of ice,",
+            "in dim light,",
+            "I dwell,",
+            "creating dreams that never quite suffice.",
+            "These cups,",
+            "they tell,",
+            "of moments lost in summer's heat and glow,",
+            "as I,",
+            "just wait,",
+            "for memories that ebb and flow."
+          ]
+        },
+        {
+          "type": "chorus",
+          "lines": [
+            "Mojito dreams,",
+            "I sip,",
+            "a taste of joy that’s bittersweet and bright,",
+            "alone,",
+            "I find,",
+            "the weight of what was shared beneath the light.",
+            "These flavors dance,",
+            "around,",
+            "like ghosts of laughter fading into night,",
+            "I reach,",
+            "but feel,",
+            "the solitude that lingers in my sight."
+          ]
+        }
+      ],
+      "notes": "The song captures the bittersweet nostalgia of a bartender crafting mojitos, reflecting on lost connections and memories tied to the act of mixing drinks.",
+      "source": "openai",
+      "model": "gpt-4o-mini",
+      "copyright_safe": true,
+      "metric_report": {
+        "melody_aligned": true,
+        "n_target_lines": 28,
+        "n_generated_lines": 24,
+        "rows": [
+          {
+            "line": "I sigh",
+            "actual_syllables": 2,
+            "target_syllables": 2,
+            "fit": true
+          },
+          {
+            "line": "and mix,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "a splash of something sweet, a hint of lime,",
+            "actual_syllables": 11,
+            "target_syllables": 12,
+            "fit": true
+          },
+          {
+            "line": "to chill,",
+            "actual_syllables": 2,
+            "target_syllables": 2,
+            "fit": true
+          },
+          {
+            "line": "and serve,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "where laughter danced, the good times rhyme.",
+            "actual_syllables": 10,
+            "target_syllables": 13,
+            "fit": false
+          },
+          {
+            "line": "Fresh mint,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "melts slow,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "as echoes wrap around the glass so tight,",
+            "actual_syllables": 10,
+            "target_syllables": 12,
+            "fit": false
+          },
+          {
+            "line": "I glimpse,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "the past,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "in every swirl, where shadows fight.",
+            "actual_syllables": 9,
+            "target_syllables": 16,
+            "fit": false
+          },
+          {
+            "line": "Sweet whispers,",
+            "actual_syllables": 3,
+            "target_syllables": 12,
+            "fit": false
+          },
+          {
+            "line": "from long ago,",
+            "actual_syllables": 4,
+            "target_syllables": 13,
+            "fit": false
+          },
+          {
+            "line": "come drifting back with every clink of ice,",
+            "actual_syllables": 11,
+            "target_syllables": 12,
+            "fit": true
+          },
+          {
+            "line": "in dim light,",
+            "actual_syllables": 3,
+            "target_syllables": 2,
+            "fit": true
+          },
+          {
+            "line": "I dwell,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "creating dreams that never quite suffice.",
+            "actual_syllables": 9,
+            "target_syllables": 12,
+            "fit": false
+          },
+          {
+            "line": "These cups,",
+            "actual_syllables": 2,
+            "target_syllables": 2,
+            "fit": true
+          },
+          {
+            "line": "they tell,",
+            "actual_syllables": 2,
+            "target_syllables": 3,
+            "fit": true
+          },
+          {
+            "line": "of moments lost in summer's heat and glow,",
+            "actual_syllables": 10,
+            "target_syllables": 11,
+            "fit": true
+          },
+          {
+            "line": "as I,",
+            "actual_syllables": 2,
+            "target_syllables": 2,
+            "fit": true
+          },
+          {
+            "line": "just wait,",
+            "actual_syllables": 2,
+            "target_syllables": 15,
+            "fit": false
+          },
+          {
+            "line": "for memories that ebb and flow.",
+            "actual_syllables": 8,
+            "target_syllables": 2,
+            "fit": false
+          }
+        ],
+        "mismatches": 8,
+        "fit_ratio": 0.67
+      }
+    },
+    "composition_brief": {
+      "language": "en",
+      "music": {
+        "bpm": 117.45383522727273,
+        "time_signature": "4/4",
+        "key": "A",
+        "mode": "minor",
+        "mood": "chilled",
+        "moods": [
+          "chilled",
+          "happy"
+        ],
+        "energy": "medium",
+        "valence": 0.7032,
+        "arousal": -0.0621,
+        "genres": [
+          "funkSoul"
+        ],
+        "subgenres": [
+          "disco",
+          "funk",
+          "soul"
+        ],
+        "instrumentation": [
+          "percussion",
+          "electricGuitar",
+          "synth",
+          "bassGuitar"
+        ],
+        "form_sections": [
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S2",
+          "S0",
+          "S1",
+          "S0",
+          "S1",
+          "S0",
+          "S1",
+          "S0",
+          "S5",
+          "S7",
+          "S2",
+          "S6",
+          "S2",
+          "S6",
+          "S4",
+          "S6",
+          "S2",
+          "S0",
+          "S1",
+          "S0",
+          "S3",
+          "S0",
+          "S1",
+          "S0",
+          "S5"
+        ]
+      },
+      "metric": {
+        "line_syllable_targets": [
+          2,
+          3,
+          12,
+          2,
+          3,
+          13,
+          3,
+          3,
+          12,
+          3,
+          3,
+          16,
+          12,
+          13,
+          12,
+          2,
+          3,
+          12,
+          2,
+          3,
+          11,
+          2,
+          15,
+          2,
+          16,
+          13,
+          13,
+          12
+        ],
+        "n_lines": 28,
+        "cadence": "descending (resolved/closing)",
+        "melodic_range_semitones": 15,
+        "has_vocal_midi": true
+      },
+      "intent": {
+        "core_theme": "Searching for connection through mojitos",
+        "emotional_temperature": "bittersweet sips of nostalgia and longing",
+        "point_of_view_options": [
+          "First-person as a bartender reflecting on patrons' stories",
+          "First-person as a lonely drinker reminiscing on past love",
+          "First-person as a friend trying to comfort a grieving companion"
+        ],
+        "possible_scenes": [
+          "A dimly lit bar with clinking glasses, where the protagonist crafts mojitos while observing the world outside",
+          "A sun-drenched patio where a couple shares laughter and secrets over their drinks, now just a memory",
+          "An empty kitchen at midnight, where the protagonist mixes ingredients alone, the sound of ice clinking echoing the silence"
+        ],
+        "lexical_fields": [
+          "mixology",
+          "memory",
+          "bittersweet",
+          "connection",
+          "loss",
+          "refreshment",
+          "nostalgia",
+          "reflection"
+        ],
+        "images_to_avoid": [
+          "drowning sorrows",
+          "tropical paradise",
+          "frozen in time",
+          "pouring one's heart out",
+          "cloudy skies"
+        ],
+        "promising_images": [
+          "fresh mint leaves trembling in the breeze",
+          "a glass sweating under the heat of a long summer day",
+          "the sound of laughter fading into the night"
+        ],
+        "possible_titles": [
+          "Mojito Memories",
+          "Sips of Solitude",
+          "Bittersweet Mix"
+        ],
+        "chorus_concepts": [
+          "A repetition of the act of making mojitos, mirroring the protagonist's attempts to reclaim lost moments, with a haunting refrain about the taste of solitude.",
+          "A contrast between the bright flavors of mojitos and the shadows of loneliness, using the drink as a metaphor for fleeting joy and lingering sorrow."
+        ]
+      },
+      "reference_abstract": {
+        "common_themes": [
+          "spiritual connection",
+          "loneliness and seeking support",
+          "forgiveness and redemption",
+          "support and reassurance",
+          "loss and farewell",
+          "transience and fleeting moments",
+          "hope and dreams",
+          "emotional pain and longing",
+          "sensual"
+        ],
+        "dominant_moods": [
+          "angst",
+          "love",
+          "reflection",
+          "despair",
+          "spirituality",
+          "solitude"
+        ],
+        "narrative_stance": "first-person reflective",
+        "imagery_density": "mid — balance of statement and image",
+        "source": "musixmatch_live"
+      },
+      "lyric_signals": {},
+      "existing_lyrics_present": false
+    }
   },
   "writing_studio": {
-    "selected_text": "",
-    "selection_type": "",
-    "selection_line_range": null,
-    "selection_audit": {},
+    "selected_text": "I saw a child draw borders\nWith a stick in the sand\nThen the tide came laughing softly",
+    "selection_type": "BLOCK",
+    "selection_line_range": [
+      0,
+      4
+    ],
+    "selection_line_idxs": [
+      0,
+      2,
+      4
+    ],
+    "selection_audit": {
+      "selection_type": "BLOCK",
+      "summary_blurb": "Strongest in metric fit (92/100); weakest in rhyme (0/100).",
+      "scores": {
+        "metric_fit": 92,
+        "stress_alignment": 63,
+        "singability": 80,
+        "mood_alignment": 50,
+        "rhyme_structure": 0,
+        "cliche_risk": 0,
+        "imagery_strength": 35,
+        "reference_alignment": 48
+      },
+      "diagnosis": {
+        "what_works": [
+          "Fits the melodic phrase well (metric fit 92/100).",
+          "Comfortable to sing."
+        ],
+        "what_does_not_work": [
+          "Lyric mood (neutral) diverges from music (unknown).",
+          "Imagery is thin / abstract."
+        ],
+        "recommended_action": [
+          "Add one concrete sensory detail the listener can picture."
+        ]
+      },
+      "metric": {
+        "mode": "melody-aware",
+        "estimated_syllables": 23,
+        "target_syllable_range": [
+          24,
+          26
+        ],
+        "available_melodic_slots": 25,
+        "per_line_targets": [
+          {
+            "line": "I saw a child draw borders",
+            "current": 7,
+            "target": 2,
+            "delta": 5
+          },
+          {
+            "line": "With a stick in the sand",
+            "current": 6,
+            "target": 3,
+            "delta": 3
+          },
+          {
+            "line": "Then the tide came laughing softly",
+            "current": 10,
+            "target": 12,
+            "delta": -2
+          }
+        ],
+        "problems": [],
+        "rewrite_targets": {
+          "min_syllables": 24,
+          "max_syllables": 26,
+          "preserve_last_word": true,
+          "preserve_rhyme": true
+        }
+      },
+      "reference": {
+        "source": "musixmatch_live",
+        "active_artist": null,
+        "related_themes": [
+          "spiritual connection",
+          "loneliness and seeking support",
+          "forgiveness and redemption",
+          "support and reassurance",
+          "loss and farewell",
+          "transience and fleeting moments"
+        ],
+        "alignment_notes": [
+          "Shares 1 territory term(s) with the reference direction."
+        ],
+        "score": 48
+      },
+      "rhyme_note": "Loose / slant endings — little end-rhyme cohesion.",
+      "imagery_notes": [
+        "Mostly abstract — consider a concrete sensory image."
+      ],
+      "safety_note": "No copyrighted lyrics or external text used — abstract descriptors only."
+    },
     "copyright_safe": true,
     "stored_content_policy": "abstract_descriptors_only_no_lyrics"
   },
