@@ -15,6 +15,31 @@ _SAFE_RULES = [
     "Use only abstract patterns",
 ]
 
+# Keys that could carry literal/copyrighted text from any provider response.
+# Anything matching these is stripped before storing/displaying/exporting.
+_LITERAL_TEXT_KEYS = {
+    "lyrics", "lyrics_body", "lyrics_copyright", "snippet", "snippet_body",
+    "quote", "quotes", "text", "excerpt", "body", "subtitle", "subtitle_body",
+    "richsync", "richsync_body", "instrumental_text", "line", "lines",
+}
+
+
+def strip_literal_text(obj: Any) -> Any:
+    """Recursively remove any keys that could contain literal/copyrighted text.
+
+    Keeps only abstract descriptors (names, counts, tags). Used defensively so
+    raw provider data can never leak lyrics/quotes into storage or the UI.
+    """
+    if isinstance(obj, dict):
+        return {
+            k: strip_literal_text(v)
+            for k, v in obj.items()
+            if k.lower() not in _LITERAL_TEXT_KEYS
+        }
+    if isinstance(obj, list):
+        return [strip_literal_text(v) for v in obj]
+    return obj
+
 # Abstract stylistic fingerprints keyed by loose genre/register buckets.
 # These are generic songwriting tendencies, not artist-specific content.
 _REGISTER_PATTERNS = {
@@ -84,11 +109,17 @@ def build_reference_profile(
     avoid_artists: list[str] | None = None,
     genre_tags: list[str] | None = None,
     lyrics_context: str = "",
+    source: str = "musixmatch_mock",
+    provider_status: dict[str, Any] | None = None,
+    fallback_reason: str | None = None,
 ) -> dict[str, Any]:
     """Create a copyright-safe abstract reference profile.
 
     `provider` is an optional LyricsCorpusProvider (mock by default) used only
     for corpus-level theme associations, never raw lyrics.
+
+    `source` records provenance: "musixmatch_live" | "musixmatch_mock_fallback" |
+    "musixmatch_mock". Output is sanitized of any literal text before return.
     """
     artists = [a.strip() for a in (artists or []) if a.strip()]
     avoid_artists = [a.strip() for a in (avoid_artists or []) if a.strip()]
@@ -192,7 +223,16 @@ def build_reference_profile(
     avoid = [f"Do not imitate the specific style of {a}." for a in avoid_artists]
     avoid.append("Avoid reproducing any recognizable melodic or lyrical phrase from references.")
 
-    return {
+    # If grounded in real catalog but caller passed a non-live source, upgrade it.
+    if grounded and source == "musixmatch_mock":
+        source = "musixmatch_live"
+
+    profile = {
+        "source": source,
+        "provider_status": provider_status or {},
+        "fallback_reason": fallback_reason,
+        "copyright_safe": True,
+        "stored_content_policy": "abstract_descriptors_only_no_lyrics",
         "artists": artists,
         "reference_songs": reference_songs or [],
         "grounded_in_real_catalog": grounded,
@@ -201,6 +241,7 @@ def build_reference_profile(
             "common_themes": common_themes or ["connection", "place", "change"],
             "lexical_fields": lexical_fields or blended.get("symbolic_register", []),
             "dominant_moods": dominant_moods,
+            "genres": [g for g, _ in grounded_genres.most_common(6)],
             "imagery_density": blended.get("imagery_density", ""),
             "narrative_stance": blended.get("narrative_stance", ""),
             "typical_energy": blended.get("typical_energy", ""),
@@ -212,3 +253,5 @@ def build_reference_profile(
         "creative_constraints": creative_constraints,
         "avoid": avoid,
     }
+    # Defensive: never let any literal/copyrighted text survive into storage.
+    return strip_literal_text(profile)

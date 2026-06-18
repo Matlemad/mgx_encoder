@@ -31,10 +31,12 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     vocal_midi = context.get("vocal_midi") or {}
     strong_positions = vocal_midi.get("strong_positions", [])
     has_midi = bool(strong_positions)
+    mode = "melody-aware" if has_midi else "heuristic"
 
     strong_words: list[str] = []
     weakly_placed: list[str] = []
     suggestions: list[str] = []
+    n_strong_slots = 0
 
     # Heuristic alignment: in a typical bar, the first content word of a phrase
     # and the last content word tend to land on strong beats. Flag content words
@@ -64,10 +66,11 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
 
     if has_midi:
         diagnosis = (
-            f"Compared against {len(strong_positions)} strong melodic positions from the vocal MIDI."
+            f"Melody-aware: compared against {len(strong_positions)} strong melodic positions "
+            f"from the vocal MIDI."
         )
     else:
-        diagnosis = "No vocal MIDI: alignment estimated from phrase structure and word types."
+        diagnosis = "Heuristic mode (no vocal MIDI): alignment estimated from phrase structure and word types."
 
     if placement_ratio < 0.5:
         suggestions.append("Several key words sit in weak metric spots — consider reordering so they land on accents.")
@@ -76,9 +79,12 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "module": "stress_alignment",
+        "mode": mode,
         "alignment_score": alignment,
         "strong_words": strong_words[:12],
         "weakly_placed_words": weakly_placed[:12],
+        "strong_melodic_positions": len(strong_positions),
+        "metric_positions_estimated": (None if has_midi else n_strong_slots),
         "diagnosis": diagnosis,
         "suggestions": suggestions,
     }

@@ -225,16 +225,19 @@ def generate_librettist_report(project: dict[str, Any]) -> str:
         for rule in ref.get("safe_inspiration_rules", []):
             lines.append(f"  - {rule}")
 
-    # Palette Results
-    palette = studio.get("palette_outputs", {})
-    if palette:
-        lines.append(_section("Palette Results"))
-        lines.append(f"- Selection: \"{studio.get('selected_text', '')[:80]}\" ({studio.get('selection_type', '')})")
-        for key, val in palette.items():
-            if key.startswith("_") or not isinstance(val, dict):
-                continue
-            title = val.get("module", key)
-            lines.append(f"- **{title}**")
+    # Line / Block Audit (Writing Studio)
+    audit = studio.get("selection_audit", {})
+    if audit and audit.get("scores"):
+        lines.append(_section("Line / Block Audit"))
+        lines.append(f"- Selection: \"{studio.get('selected_text', '')[:80]}\" ({audit.get('selection_type', '')})")
+        if audit.get("summary_blurb"):
+            lines.append(f"- Summary: {audit['summary_blurb']}")
+        sc = audit.get("scores", {})
+        _order = ["metric_fit", "stress_alignment", "singability", "mood_alignment",
+                  "rhyme_structure", "imagery_strength", "reference_alignment", "cliche_risk"]
+        scored = "; ".join(f"{k.replace('_', ' ')}: {sc[k]}/100" for k in _order if k in sc)
+        if scored:
+            lines.append(f"- Scores: {scored}")
 
     # Warnings
     if genome.get("warnings"):

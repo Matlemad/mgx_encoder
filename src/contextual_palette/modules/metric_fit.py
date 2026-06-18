@@ -35,9 +35,11 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
 
     slots = 0
     source = "heuristic"
+    mode = "heuristic"
     problems: list[str] = []
+    has_midi = bool(vocal_midi and vocal_midi.get("suggested_syllable_slots"))
 
-    if vocal_midi and vocal_midi.get("suggested_syllable_slots"):
+    if has_midi:
         phrases = vocal_midi.get("phrase_estimates", [])
         if phrases:
             # Use average phrase length scaled to the number of selected lines.
@@ -46,6 +48,7 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
         else:
             slots = int(vocal_midi["suggested_syllable_slots"])
         source = "vocal_midi"
+        mode = "melody-aware"
     else:
         # Heuristic: at ~moderate tempo, a comfortable line holds ~6-10 syllables.
         per_line = 8
@@ -55,7 +58,11 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
             elif bpm < 80:
                 per_line = 10
         slots = per_line * n_lines
-        problems.append("No vocal MIDI: melodic slots estimated from BPM and line count.")
+        problems.append("No vocal MIDI: melodic slots estimated from BPM and line count (heuristic mode).")
+
+    # Target syllable window (slightly tolerant around the slot count).
+    target_min = max(1, slots - 1)
+    target_max = slots + 1
 
     diff = estimated - slots
     if slots > 0:
@@ -63,14 +70,21 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     else:
         fit_score = 0.0
 
+    slot_phrase = (f"the vocal melody phrase suggests {target_min}\u2013{target_max} syllable slots"
+                   if mode == "melody-aware"
+                   else f"a comfortable phrase here holds about {target_min}\u2013{target_max} syllables")
+
     if diff > 2:
-        diagnosis = f"Too many syllables (~{estimated}) for ~{slots} melodic slots: the line may feel crammed."
+        diagnosis = (f"This line has {estimated} estimated syllables, while {slot_phrase}. "
+                     f"It will probably feel rushed.")
         problems.append("Words will likely rush against the melody.")
     elif diff < -2:
-        diagnosis = f"Too few syllables (~{estimated}) for ~{slots} slots: melody may have empty notes."
+        diagnosis = (f"This line has {estimated} estimated syllables, while {slot_phrase}. "
+                     f"The melody may have empty notes / feel stretched.")
         problems.append("Consider adding a word or extending an image.")
     else:
-        diagnosis = f"Good fit: ~{estimated} syllables for ~{slots} melodic slots."
+        diagnosis = (f"This line has {estimated} estimated syllables, and {slot_phrase}. "
+                     f"It fits comfortably.")
 
     suggested = []
     if diff > 2:
@@ -80,6 +94,7 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "module": "metric_fit",
+        "mode": mode,
         "selected_text": text[:200],
         "estimated_syllables": estimated,
         "available_melodic_slots": slots,
@@ -88,9 +103,10 @@ def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
         "diagnosis": diagnosis,
         "problems": problems,
         "suggested_adjustments": suggested,
+        "suggested_target_syllable_range": [target_min, target_max],
         "rewrite_targets": {
-            "min_syllables": max(1, slots - 1),
-            "max_syllables": slots + 1,
+            "min_syllables": target_min,
+            "max_syllables": target_max,
             "preserve_last_word": True,
             "preserve_rhyme": True,
         },

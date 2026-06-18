@@ -88,14 +88,21 @@ def _what_changed(style: str, lexical_change: bool, length_change: int) -> str:
 
 def run(text: str, context: dict[str, Any]) -> dict[str, Any]:
     controls = context.get("rewrite_controls", {}) or {}
-    preserve = {**_DEFAULT_PRESERVE, **(controls.get("preserve") or {})}
     target_syllables = controls.get("target_syllables")
     # Optional single-style focus; otherwise produce a spread of styles.
     focus_style = controls.get("style")
     styles = [focus_style] if focus_style in _STYLES else _STYLES
 
-    # Honor metric_fit rewrite targets if present in context.
+    # Honor metric_fit rewrite targets if present in context (target syllables +
+    # last-word / rhyme preservation). Explicit user controls win over these.
     metric_targets = context.get("metric_fit_targets") or {}
+    preserve = {**_DEFAULT_PRESERVE}
+    if "preserve_last_word" in metric_targets:
+        preserve["last_word"] = bool(metric_targets["preserve_last_word"])
+    if "preserve_rhyme" in metric_targets:
+        preserve["rhyme"] = bool(metric_targets["preserve_rhyme"])
+    preserve.update(controls.get("preserve") or {})
+
     if target_syllables is None and metric_targets:
         lo = metric_targets.get("min_syllables")
         hi = metric_targets.get("max_syllables")

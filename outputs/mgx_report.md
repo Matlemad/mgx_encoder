@@ -1,82 +1,78 @@
 # MGX-v1 Report
 
-_Generated: 2026-06-10 12:08:12_
+_Generated: 2026-06-18 11:22:49_
 
 ## Metadata
 - **Source**: file
-- **Filename**: Tutti Morti.mp3
-- **Duration**: 81.6s
+- **Filename**: TestSong_demo.mp3
+- **Duration**: 133.7s
 - **Sample Rate**: 44100 Hz
 - **Analysis SR**: 22050 Hz
 
 ## R — Rhythm
-- **BPM**: 172.265625
-- **Time Signature**: 3/4
-- **Beat Regularity**: 0.96
-- **Groove Complexity**: 0.25
-- **Swing Ratio**: 0.30
+- **BPM**: 117.45383522727273
+- **Time Signature**: 4/4
+- **Beat Regularity**: 0.98
+- **Groove Complexity**: 0.08
+- **Swing Ratio**: 0.51
 - **BPM Confidence**: 1.00
 
 ## M — Melody
-- **Pitch Range**: 1506.2 Hz
-- **Mean Pitch**: 406.1 Hz
-- **Mean Interval**: 0.48 semitones
-- **Contour Direction**: -0.01
-- **Stepwise Ratio**: 0.94
+- **Pitch Range**: 898.6 Hz
+- **Mean Pitch**: 528.4 Hz
+- **Mean Interval**: 0.86 semitones
+- **Contour Direction**: -0.04
+- **Stepwise Ratio**: 0.91
 - **Voiced Ratio**: 1.00
-- **Vocal Likelihood**: 0.42
-- **Pitch Confidence**: 0.42
-- **Top Contour Bigrams**: RR=0.67, DR=0.07, RD=0.07
+- **Vocal Likelihood**: 0.71
+- **Pitch Confidence**: 0.70
+- **Top Contour Bigrams**: RR=0.61, DR=0.08, RD=0.08
 
 ## H — Harmony
-- **Key Center**: C
-- **Mode**: major
-- **Key Confidence**: 0.32
+- **Key Center**: A
+- **Mode**: minor
+- **Key Confidence**: 1.00
 - **Mode Ambiguity**: low
-- **Tuning Offset**: +0.0 cents
+- **Tuning Offset**: +4.0 cents
 - **Key Candidates**:
-  - C major: 0.7718
-  - A minor: 0.7391
-  - F major: 0.6256
-- **Harmonic Change Rate**: 0.0245
-- **Chroma Entropy**: 3.23
-- **Chord Estimation Tier**: 2 (Root sequence only)
-- **Chord Confidence**: 0.73
-- **Root Sequence**: F | C | A | F | C | A | F | C | A | F | A | C | G | E | A | F | D | C | A | D | F | D | F | C | A | F | D | A | D | F | D | C
-- **Section-Weighted Key**: C major (score 0.703)
-- **Relative Root Functions**: IV | I | VI | IV | I | VI | IV | I | VI | IV | VI | I | V | III | VI | IV | II | I | VI | II | IV | II | IV | I
-- **Harmonic Rhythm (changes/beat)**: 0.290
-  - _Note_: Relative key A minor is close (gap=0.033)
+  - A minor: 0.8349
+  - C major: 0.6017
+  - F major: 0.6014
+- **Harmonic Change Rate**: 0.0304
+- **Chroma Entropy**: 3.00
+- **Chord Estimation Tier**: 1 (Full chords)
+- **Chord Confidence**: 0.80
+- **Chord Sequence**: Amin | Am7 | Amin | Am7 | Amin | Am7 | D | D7 | D | D7 | Am7 | Amin | Am7 | Amin | Am7 | F#dim | D | D7 | D | Am7 | D7 | Am7 | Amin | Am7 | Amin | Am7 | D | D7 | D | D7 | F#m7 | Am7
+- **Section-Weighted Key**: A minor (score 0.822)
+- **Relative Root Functions**: I | IV | I | VI | IV | I | IV | I | IV | VI | I | IV | I | V | bVII | IV | I | V | bVII | IV | I | V | bVII | V
+- **Relative Chord Functions**: Imin | Im7 | Imin | Im7 | Imin | Im7 | IV | IV7 | IV | IV7 | Im7 | Imin | Im7 | Imin | Im7 | VIdim | IV | IV7 | IV | Im7 | IV7 | Im7 | Imin | Im7
+- **Harmonic Rhythm (changes/beat)**: 0.250
 
 ## X — Motif
-- **Repetition Density**: 0.8441
-- **Mean Self-Similarity**: 0.93
-- **Motif Pairs Found**: 2280
+- **Repetition Density**: 0.9843
+- **Mean Self-Similarity**: 0.99
+- **Motif Pairs Found**: 7875
 - **Estimated Unique Motifs**: 1
 - **Motif Confidence**: 1.00
 
 ## F — Form
-- **Sections Detected**: 7
-- **Unique Section Types**: 6
-- **Structural Repetition**: 0.14
-- **Section Sequence**: S4 -> S5 -> S2 -> S1 -> S0 -> S3 -> S0
+- **Sections Detected**: 32
+- **Unique Section Types**: 8
+- **Structural Repetition**: 0.75
+- **Section Sequence**: S6 -> S2 -> S6 -> S2 -> S6 -> S2 -> S6 -> S2 -> S0 -> S1 -> S0 -> S1 -> S0 -> S1 -> S0 -> S5 -> S7 -> S2 -> S6 -> S2 -> S6 -> S4 -> S6 -> S2 -> S0 -> S1 -> S0 -> S3 -> S0 -> S1 -> S0 -> S5
 - **Form Confidence**: 1.00
 
 ## C — Confidence
-- **Overall Confidence**: 0.74
-- **Melody/Harmony Agreement**: 0.60
+- **Overall Confidence**: 0.93
+- **Melody/Harmony Agreement**: 0.58
   - rhythm: 1.00
-  - melody: 0.42
-  - harmony: 0.27
+  - melody: 0.70
+  - harmony: 0.95
   - motif: 1.00
   - form: 1.00
 
-## Warnings
-- Low confidence in harmony (0.27)
-
 ## Notes
-- Moderate melody/harmony alignment (agreement=0.60)
-- Relative key A minor is close (gap=0.033)
+- Moderate melody/harmony alignment (agreement=0.58)
 
 ---
 

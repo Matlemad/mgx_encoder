@@ -9,6 +9,7 @@ later delegate to an LLM provider while keeping the output schema stable.
 """
 from __future__ import annotations
 
+import json
 import re
 from typing import Any
 
@@ -96,13 +97,129 @@ def _match_theme(prompt: str) -> str:
     return best
 
 
+_BRIEF_KEYS = [
+    "core_theme", "point_of_view_options", "emotional_temperature", "possible_scenes",
+    "lexical_fields", "images_to_avoid", "promising_images", "possible_titles",
+    "chorus_concepts", "narrative_arc_options",
+]
+
+_AI_SYSTEM = (
+    "You are a songwriting development editor. From a theme/concept you produce a "
+    "structured, ORIGINAL, copyright-safe WRITING BRIEF — directions only, never full lyrics, "
+    "never quoting existing songs. Be specific to the given prompt (use its own nouns and imagery), "
+    "and propose fresh, concrete images rather than clichés. Output STRICT JSON only."
+)
+
+
+def _parse_json(raw: str) -> dict[str, Any] | None:
+    if not raw:
+        return None
+    text = re.sub(r"^```(?:json)?", "", raw.strip()).strip()
+    text = re.sub(r"```$", "", text).strip()
+    try:
+        return json.loads(text)
+    except Exception:  # noqa: BLE001
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except Exception:  # noqa: BLE001
+                return None
+    return None
+
+
+def _ai_writing_brief(
+    prompt: str,
+    language: str,
+    mgx_summary: dict[str, Any] | None,
+    cyanite: dict[str, Any] | None,
+    provider: Any,
+    reference_profile: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """LLM-grounded brief tailored to the actual prompt. Returns None on failure."""
+    music_bits = []
+    if cyanite and cyanite.get("mood_primary"):
+        music_bits.append(f"music mood: {cyanite['mood_primary']}")
+    if mgx_summary:
+        if mgx_summary.get("mode"):
+            music_bits.append(f"key mode: {mgx_summary['mode']}")
+        if mgx_summary.get("bpm"):
+            music_bits.append(f"tempo: {mgx_summary['bpm']} BPM")
+    music_ctx = ("; ".join(music_bits)) or "n/a"
+
+    # Abstract reference direction (Musixmatch) — inspiration only, never imitation.
+    ref_line = ""
+    rp = reference_profile or {}
+    patterns = rp.get("abstract_patterns", {}) if isinstance(rp, dict) else {}
+    if patterns:
+        bits = []
+        if patterns.get("common_themes"):
+            bits.append(f"recurring themes: {', '.join(patterns['common_themes'][:5])}")
+        if patterns.get("dominant_moods"):
+            bits.append(f"moods: {', '.join(patterns['dominant_moods'][:4])}")
+        if patterns.get("narrative_stance"):
+            bits.append(f"narrative stance: {patterns['narrative_stance']}")
+        if bits:
+            ref_line = (
+                "\nAbstract reference direction (inspiration ONLY — never imitate specific lines, "
+                f"derived from Musixmatch analysis): {'; '.join(bits)}.\n"
+            )
+
+    user = (
+        f"THEME / CONCEPT (write the brief specifically about this): \"\"\"{prompt[:1200]}\"\"\"\n"
+        f"Language for all text: {language}.\n"
+        f"Musical context to honour in tone: {music_ctx}.\n"
+        f"{ref_line}\n"
+        "Return STRICT JSON with EXACTLY these keys:\n"
+        "{\n"
+        '  "core_theme": short phrase capturing the concept,\n'
+        '  "emotional_temperature": one vivid phrase,\n'
+        '  "point_of_view_options": [3 distinct POV options],\n'
+        '  "possible_scenes": [3 concrete original scenes tied to the prompt],\n'
+        '  "lexical_fields": [6-8 word fields/registers],\n'
+        '  "images_to_avoid": [4-5 clichés to avoid for this theme],\n'
+        '  "promising_images": [3 fresh concrete images],\n'
+        '  "possible_titles": [3 original title ideas],\n'
+        '  "chorus_concepts": [2 chorus ideas, described not written],\n'
+        '  "narrative_arc_options": [3 short arcs like "a -> b -> c"]\n'
+        "}\n"
+        "No commentary. JSON object only. Do NOT write any full lyric lines."
+    )
+    try:
+        raw = provider.generate(user, system=_AI_SYSTEM, max_tokens=700, temperature=0.7)
+    except Exception:  # noqa: BLE001
+        return None
+    data = _parse_json(raw)
+    if not isinstance(data, dict):
+        return None
+    # Validate the essential keys are present and non-trivial.
+    if not data.get("core_theme") or not data.get("possible_scenes"):
+        return None
+    out = {k: data.get(k, []) for k in _BRIEF_KEYS}
+    out["core_theme"] = str(data.get("core_theme", "")).strip()
+    out["emotional_temperature"] = str(data.get("emotional_temperature", "")).strip()
+    out["source"] = "ai"
+    out["copyright_safe_note"] = (
+        "AI-generated brief: abstract directions and original seed images only. "
+        "No existing song is reproduced. The songwriter remains the author."
+    )
+    return out
+
+
 def generate_writing_brief(
     theme_prompt: str,
     language: str = "auto",
     mgx_summary: dict[str, Any] | None = None,
     cyanite: dict[str, Any] | None = None,
+    provider: Any | None = None,
+    reference_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build a structured, copyright-safe writing brief from a theme prompt."""
+    """Build a structured, copyright-safe writing brief from a theme prompt.
+
+    If a live LLM `provider` is supplied, the brief is generated by the model and
+    tailored to the actual prompt (grounded in the abstract `reference_profile`
+    when present); otherwise a heuristic template is used.
+    """
     prompt = (theme_prompt or "").strip()
     if not prompt:
         return {
@@ -118,6 +235,12 @@ def generate_writing_brief(
             "narrative_arc_options": [],
             "copyright_safe_note": "No prompt provided.",
         }
+
+    # Prefer an AI-grounded brief when a live LLM provider is available.
+    if provider is not None and getattr(provider, "is_live", False):
+        ai = _ai_writing_brief(prompt, language, mgx_summary, cyanite, provider, reference_profile)
+        if ai:
+            return ai
 
     theme_key = _match_theme(prompt)
     lib = _THEME_LIBRARY[theme_key]
@@ -156,6 +279,7 @@ def generate_writing_brief(
             " → ".join(reversed(lib["arc"])),
             "scene → detail → reversal",
         ],
+        "source": "heuristic",
         "copyright_safe_note": (
             "This brief contains only abstract directions and original seed images. "
             "It does not reproduce any existing song. The songwriter remains the author."
