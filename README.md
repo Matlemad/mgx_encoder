@@ -9,8 +9,8 @@ MGX Librettist **non è un generatore di canzoni**: è un **layer di intelligenz
 - **Cyanite enrichment** — genere, mood, energy, valence, arousal, strumentazione, BPM, key (API GraphQL reale, con fallback mock)
 - **Lyrics Prompter** — due modalità: testo già scritto (struttura + prosodia + mining) o solo un tema (**Writing Brief AI**, con fallback euristico)
 - **Reference Profile** — astrazione copyright-safe di artisti/canzoni di riferimento (Musixmatch)
-- **Reactive Lyrics Editor + Line/Block Audit** — clicchi una riga/blocco e il pannello mostra automaticamente 8 punteggi (Metric Fit, Stress Alignment, Singability, Mood, Rhyme, Cliché Risk, Imagery, Reference Alignment), una diagnosi e un'azione consigliata
-- **Rephrase on melody** — controlli semplici (mood, struttura rime, artista reference da Musixmatch) e un bottone Rephrase che propone un'alternativa sulla metrica (OpenAI solo al click); **Apply** sostituisce solo la riga/blocco selezionato
+- **Reactive Lyrics Editor + Line/Block Audit** — attivi una o più caselle dei versi (anche non adiacenti) e il pannello mostra automaticamente 8 punteggi (Metric Fit, Stress Alignment, Singability, Mood, Rhyme, Cliché Risk, Imagery, Reference Alignment), una diagnosi e un'azione consigliata
+- **Rephrase on melody** — controlli semplici (mood, struttura rime, aderenza alla metrica, artista reference da Musixmatch) e un bottone Rephrase che propone un'alternativa con **target di sillabe per riga dal MIDI vocale** (OpenAI solo al click, con re-pass correttivi); **Apply** sostituisce solo i versi selezionati, ciascuno al suo posto
 - **Metric Draft Scaffold** — strumento secondario per impostare un draft strutturato sulla metrica del MIDI, con validazione sillabica
 - **Indicatori di progresso** — ogni tab mostra una spunta verde (✅) al completamento dello step
 
@@ -75,7 +75,7 @@ L'app è organizzata in **5 tab**:
 1. **Demo Uploader**: carica il demo audio (richiesto) e, opzionalmente, MIDI vocale + MIDI backing + metadata manuali. Genera la *Song Genome Summary*.
 2. **Lyrics Prompter**: scegli la modalità — **A** (ho già il testo: struttura, prosodia, text mining) o **B** (ho solo un tema: genera un *Writing Brief*, non testi completi).
 3. **References**: inserisci artisti/canzoni/tag di riferimento. Genera un *Reference Profile* copyright-safe (solo pattern astratti).
-4. **Writing Studio**: editor reattivo a sinistra, **Line/Block Audit + Rephrase** a destra, riepilogo del brano in alto. **Clicca** una riga (o "Select block" su una strofa/ritornello): il pannello fa l'audit automatico, poi puoi fare **Rephrase** e **Apply**. In fondo c'è il **Metric Draft Scaffold** per impostare un draft sulla metrica.
+4. **Writing Studio**: editor reattivo a sinistra, **Line/Block Audit + Rephrase** a destra, riepilogo del brano in alto. **Attiva/disattiva una o più caselle dei versi** (anche non adiacenti): il pannello fa l'audit automatico melody-aware, poi puoi fare **Rephrase** e **Apply** solo sui versi selezionati. In fondo c'è il **Metric Draft Scaffold** per impostare un draft sulla metrica. Per cambiare il testo sorgente torna al **Lyrics Prompter**: il nuovo testo si sincronizza qui automaticamente.
 5. **Export**: scarica `full_project.json`, il report Markdown e i singoli JSON.
 
 > MIDI opzionale: se non carichi un MIDI vocale, i moduli metrici useranno stime euristiche da BPM e lunghezza dei versi.
@@ -436,10 +436,12 @@ Una callout **"Suggested references demo"** guida i giudici: 1) aggiungi 2–3 a
 
 ### 4 — Writing Studio (reactive lyric editor)
 Il cuore dell'esperienza. In alto il riepilogo del brano e il box di contesto reference; sotto, due colonne:
-- **Sinistra — Lyrics editor reattivo**: un `text_area` editabile (persistente) **più** una lista cliccabile di righe e blocchi. Clicca **"Select block"** su una strofa/ritornello, oppure una **singola riga**, per selezionarla. La riga selezionata è evidenziata (●).
+- **Sinistra — Lyrics editor reattivo**: un `text_area` editabile (persistente) **più** una lista di **caselle dei versi multi-selezionabili**. Clicca le caselle per attivarle/disattivarle (toggle ☑/☐): puoi selezionare **più versi anche non adiacenti** (es. 1, 2 e 4 saltando il 3); un bottone **Clear** azzera la selezione. I versi non selezionati restano intatti.
 - **Destra — Line/Block Audit**: appena selezioni qualcosa, il pannello si aggiorna **automaticamente** (nessun bottone "run").
 
 Interazione principale: **Select → Audit → Rephrase → Apply.**
+
+**Sincronizzazione con il Lyrics Prompter.** Per cambiare il testo sorgente o ripartire con un'idea nuova, torna al **Lyrics Prompter**: l'editor dello Studio usa una chiave versionata, quindi quando il testo cambia lì (Mode A) si **re-inizializza automaticamente** con il nuovo testo (niente più testo vecchio). Se in **Mode B** generi un nuovo Writing Brief con un topic diverso, le lyrics/draft precedenti vengono **azzerati**: lo Studio riparte pulito dal nuovo concept, pronto per il Metric Draft Scaffold. Le modifiche fatte direttamente nell'editor (⌘/Ctrl+Enter o uscendo dal campo) ri-sincronizzano le caselle dei versi e ricalcolano prosodia/text mining.
 
 **Line/Block Audit** mostra:
 - un blurb **"perché questa riga/blocco funziona o no"**;
@@ -452,12 +454,12 @@ L'audit è **deterministico e veloce** (riusa la logica dei moduli esistenti: me
 
 **Rephrase controls** (solo questi): un **Mood slider** (darker / balanced / brighter, default inferito dal mood del brano), un **Rhyme structure slider** (AABB / ABAB / ABBA / loose-slant), uno slider **"Stick to melody metric"** (loose / balanced / tight) e un **selettore artista reference** popolato da `reference_profile.artists` (Musixmatch). L'artista influenza il rephrase **solo come direzione astratta** (temi, mood, densità di immagini, stance) — mai imitazione né citazione.
 
-> **Target per-riga**: il rephrase calcola un target di sillabe **per ciascuna riga** della selezione (dalle frasi del MIDI vocale, o ripartendo il range del blocco quando il MIDI non c'è) e lo passa a OpenAI riga per riga, con l'istruzione esplicita di **riscrivere le parole** (comprimere/espandere) per centrare il target — **non** di limitarsi a ri-spezzare il testo originale. Lo slider *tight* alza la priorità metrica (e la temperatura) per forzare una vera parafrasi sulla metrica.
+> **Target per-riga (vero MIDI per frase)**: il rephrase mappa **ogni verso selezionato alla sua frase del MIDI vocale**, in base alla posizione globale del verso tra le righe cantate. Se la prima frase del MIDI ha 2 note, la prima riga punta a ~2 sillabe (anche se sembra "estremo"). Con selezione non contigua (es. versi 1, 2, 4) ogni verso prende il target della frase corrispondente, saltando quelle dei versi non selezionati. Quando il MIDI manca si usa un fallback euristico dal range del blocco. I target sono passati a OpenAI riga per riga con l'istruzione esplicita di **riscrivere le parole** (comprimere/espandere) per centrare ciascun target — **non** di ri-spezzare il testo — sottolineando che i target possono essere **molto diversi tra righe** e non vanno uniformati. Lo slider *tight* alza la priorità metrica (e la temperatura) e abilita più **re-pass correttivi**: dopo ogni tentativo le sillabe vengono ricontate e le righe ancora fuori target vengono rimandate al modello con le correzioni esatte (cut/add).
 
-- **Rephrase**: chiama OpenAI **solo al click**, riscrive **solo** la riga/blocco selezionato rispettando metrica/mood/rime, e mostra una spiegazione + un check metrico. Con LLM non disponibile/quota esaurita → **fallback euristico** (nessun crash, warning chiaro).
-- **Apply**: sostituisce **solo** la riga/blocco selezionato (per **indice di riga**, quindi nessuna ambiguità con occorrenze ripetute), aggiorna il testo, ri-esegue prosodia/text mining se attivi e mostra "Applied to lyrics editor." Il draft dell'utente non viene mai sovrascritto per intero.
+- **Rephrase**: chiama OpenAI **solo al click**, riscrive **solo** i versi selezionati rispettando metrica/mood/rime, e mostra una spiegazione + un check metrico per riga. Con LLM non disponibile/quota esaurita → **fallback euristico** (nessun crash, warning chiaro).
+- **Apply**: sostituisce **solo** i versi selezionati, ciascuno **al suo posto per indice di riga** (anche selezioni non contigue: i versi non selezionati restano invariati), aggiorna il testo, ri-esegue prosodia/text mining se attivi e mostra "Applied to lyrics editor." Il draft dell'utente non viene mai sovrascritto per intero.
 
-> Nota tecnica: `st.text_area` non espone la selezione live in Streamlit. Usiamo quindi un modello **click-to-select** riga/blocco, che per l'Apply è anche più robusto (sostituzione per indice). La UX resta reattiva: niente copia/incolla manuale.
+> Nota tecnica: `st.text_area` non espone la selezione live in Streamlit. Usiamo quindi un modello **click-to-select** a caselle dei versi (multi-selezione, anche non contigua), che per l'Apply è anche più robusto (sostituzione per indice di riga). La UX resta reattiva: niente copia/incolla manuale.
 
 #### Metric Draft Scaffold — draft sulla melodia (strumento secondario, copyright-safe)
 Sotto l'editor reattivo c'è il **Metric Draft Scaffold** (ex Draft Composer): non è un generatore di canzoni, ma uno strumento per **impostare un draft strutturato sulla metrica del MIDI** quando parti da zero o vuoi riscrivere un'intera sezione. Combina **tutto** il contesto raccolto prima:
@@ -803,6 +805,7 @@ Lo stato di progetto unificato esportato dall'app:
   "writing_studio": {
     "selected_text": "", "selection_type": "LINE | BLOCK | STANZA | CHORUS | FULL_TEXT",
     "selection_line_range": [0, 0],
+    "selection_line_idxs": [0, 1, 3],
     "selection_audit": { "scores": {}, "diagnosis": {}, "metric": {}, "reference": {} },
     "copyright_safe": true, "stored_content_policy": "abstract_descriptors_only_no_lyrics"
   },
